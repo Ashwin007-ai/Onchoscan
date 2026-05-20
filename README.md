@@ -38,15 +38,12 @@
 - **Patient History**: Track and compare historical patient data
 - **Recommendation Engine**: AI-driven clinical recommendations based on analysis
 - **Authentication System**: Secure user login and role-based access
-- **Responsive UI**: Mobile-friendly web interface
 
 ### Advanced Features
 - Comparative analysis between patient records
-- Customizable prediction thresholds
 - Export functionality for reports
 - Real-time model inference
 - Patient profile management
-- Advanced search and filtering
 
 ---
 
@@ -105,7 +102,6 @@ Onchoscan/
 - **HTML5**: Semantic markup and structure
 - **CSS3**: Responsive styling and animations
 - **JavaScript (ES6+)**: Dynamic interactions and AJAX
-- **Custom CSS**: No external CSS frameworks
 
 ### ML/Data Science
 - **Model Framework**: PyTorch
@@ -436,8 +432,6 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 - ✅ Private use
 - ⚠️ Liability limited
 - ⚠️ Warranty not provided
-
-**Notice**: Include the following in your project:
 ```
 MIT License
 
