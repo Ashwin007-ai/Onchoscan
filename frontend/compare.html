@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function(){
+  if(localStorage.getItem("oncho_theme")==="light")
+    document.documentElement.classList.add("preload-light");
+})();
+</script>
+<style>html.preload-light body { background:#f2f8f5 !important; }</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnchoScan – Compare Scans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── Layout ──────────────────────────────────────────────────── */
+.cmp-container { max-width: 1100px; margin: 0 auto; padding: 0 20px 60px; }
+
+/* ── Patient selector card ───────────────────────────────────── */
+.cmp-select-card {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 16px; padding: 28px; margin-bottom: 28px;
+}
+.cmp-select-card h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0 0 16px; }
+.cmp-select-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.cmp-field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px; }
+.cmp-field label { font-size: 0.75rem; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; }
+.cmp-select {
+  padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+  background: var(--bg3); color: var(--text); font-size: 0.88rem;
+  font-family: inherit; cursor: pointer; transition: border-color .15s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a6980' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+}
+.cmp-select:focus { outline: none; border-color: var(--accent2); }
+.cmp-select option { background: var(--bg2); }
+.btn-load-patient {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 10px; border: none;
+  background: var(--accent2); color: #050d15; font-size: 0.88rem;
+  font-weight: 700; cursor: pointer; font-family: inherit;
+  transition: opacity .15s; white-space: nowrap; flex-shrink: 0;
+}
+.btn-load-patient:hover { opacity: .85; }
+.btn-load-patient:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Timeline ────────────────────────────────────────────────── */
+.cmp-timeline-wrap {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 24px; margin-bottom: 28px;
+  display: none;
+}
+.cmp-timeline-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+}
+.cmp-timeline-header h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0; }
+.cmp-timeline-hint { font-size: 0.78rem; color: var(--text3); }
+.cmp-timeline-hint strong { color: var(--accent); }
+
+.cmp-timeline { position: relative; padding-left: 28px; }
+.cmp-timeline::before {
+  content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px;
+  width: 2px; background: var(--border2); border-radius: 2px;
+}
+
+.cmp-scan-card {
+  position: relative; margin-bottom: 14px;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  cursor: pointer; transition: border-color .15s, background .15s;
+  display: flex; align-items: center; gap: 14px;
+}
+.cmp-scan-card::before {
+  content: ''; position: absolute; left: -24px; top: 50%; transform: translateY(-50%);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--border2); border: 2px solid var(--bg3);
+  transition: background .15s;
+}
+.cmp-scan-card:hover { border-color: var(--accent2); }
+.cmp-scan-card.selected-a { border-color: var(--accent2); background: rgba(0,212,255,.06); }
+.cmp-scan-card.selected-a::before { background: var(--accent2); }
+.cmp-scan-card.selected-b { border-color: var(--accent); background: rgba(79,255,176,.06); }
+.cmp-scan-card.selected-b::before { background: var(--accent); }
+.cmp-scan-card.disabled { opacity: .45; cursor: not-allowed; pointer-events: none; }
+
+.cmp-scan-num {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: var(--bg2); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 700; color: var(--text3);
+}
+.cmp-scan-card.selected-a .cmp-scan-num { background: var(--accent2); color: #050d15; border-color: var(--accent2); }
+.cmp-scan-card.selected-b .cmp-scan-num { background: var(--accent); color: #050d15; border-color: var(--accent); }
+
+.cmp-scan-body { flex: 1; min-width: 0; }
+.cmp-scan-body .sc-pred { font-size: 0.88rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.cmp-scan-body .sc-date { font-size: 0.75rem; color: var(--text3); margin-top: 2px; }
+.cmp-scan-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.cmp-scan-conf { font-size: 0.82rem; font-weight: 700; color: var(--accent2); }
+.cmp-sel-badge {
+  font-size: 0.65rem; font-weight: 800; padding: 2px 8px;
+  border-radius: 20px; display: none; text-transform: uppercase; letter-spacing: .06em;
+}
+.cmp-scan-card.selected-a .cmp-sel-badge.badge-a { display: inline-block; background: var(--accent2); color: #050d15; }
+.cmp-scan-card.selected-b .cmp-sel-badge.badge-b { display: inline-block; background: var(--accent); color: #050d15; }
+
+/* ── Compare button ──────────────────────────────────────────── */
+.cmp-action-bar {
+  display: none; justify-content: center; gap: 12px;
+  margin-bottom: 28px; flex-wrap: wrap;
+}
+.btn-compare {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 32px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #050d15; font-size: 0.95rem; font-weight: 800;
+  cursor: pointer; font-family: inherit; transition: opacity .15s;
+}
+.btn-compare:hover { opacity: .88; }
+.btn-compare:disabled { opacity: .4; cursor: not-allowed; }
+.btn-clear-sel {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 20px; border-radius: 12px;
+  border: 1.5px solid var(--border); background: var(--bg3);
+  color: var(--text2); font-size: 0.88rem; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all .15s;
+}
+.btn-clear-sel:hover { border-color: var(--accent2); color: var(--accent2); }
+
+/* ── Comparison panel ────────────────────────────────────────── */
+.cmp-panel { display: none; }
+.cmp-panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+}
+.cmp-panel-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); margin: 0; }
+.btn-reset-cmp {
+  padding: 7px 16px; border-radius: 8px; border: 1.5px solid var(--border);
+  background: var(--bg3); color: var(--text2); font-size: 0.8rem;
+  font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s;
+}
+.btn-reset-cmp:hover { border-color: var(--accent3); color: var(--accent3); }
+
+/* ── Side-by-side scan panels ────────────────────────────────── */
+.cmp-sides { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.cmp-side {
+  background: var(--surface); border-radius: 16px; overflow: hidden;
+  border: 1.5px solid var(--border);
+}
+.cmp-side-header {
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.cmp-side-label {
+  font-size: 0.7rem; font-weight: 800; padding: 3px 10px;
+  border-radius: 20px; text-transform: uppercase; letter-spacing: .08em;
+}
+.cmp-side-label.lbl-a { background: var(--accent2); color: #050d15; }
+.cmp-side-label.lbl-b { background: var(--accent);  color: #050d15; }
+.cmp-side-date { font-size: 0.78rem; color: var(--text3); }
+.cmp-side-body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+
+/* prediction + risk */
+.cmp-pred-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cmp-pred-name { font-size: 1rem; font-weight: 700; color: var(--text); }
+.cmp-pred-name.changed { color: var(--accent3); }
+
+/* confidence bar */
+.cmp-conf-label { font-size: 0.75rem; color: var(--text3); margin-bottom: 4px; }
+.cmp-conf-bar-bg { height: 8px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
+.cmp-conf-bar-fill { height: 100%; border-radius: 4px; transition: width .8s ease; }
+.cmp-conf-val { font-size: 0.82rem; font-weight: 700; color: var(--accent2); margin-top: 3px; }
+
+/* class probs */
+.cmp-probs { display: flex; flex-direction: column; gap: 6px; }
+.cmp-prob-row { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
+.cmp-prob-name { width: 110px; flex-shrink: 0; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmp-prob-bg { flex: 1; height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.cmp-prob-fill { height: 100%; border-radius: 3px; background: var(--accent2); transition: width .8s ease; }
+.cmp-prob-pct { width: 38px; text-align: right; color: var(--text3); flex-shrink: 0; }
+
+/* heatmap images */
+.cmp-images { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cmp-img-wrap { display: flex; flex-direction: column; gap: 4px; }
+.cmp-img-label { font-size: 0.68rem; color: var(--text3); text-align: center; }
+.cmp-img-wrap img { width: 100%; border-radius: 8px; border: 1px solid var(--border); display: block; }
+.cmp-pdf-link {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg3); color: var(--text2); text-decoration: none;
+  font-size: 0.78rem; font-weight: 600; transition: all .12s;
+}
+.cmp-pdf-link:hover { border-color: var(--accent2); color: var(--accent2); }
+
+/* ── Delta / change summary strip ────────────────────────────── */
+.cmp-delta {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 16px; padding: 22px 24px; margin-bottom: 20px;
+}
+.cmp-delta h4 { font-size: 0.88rem; font-weight: 700; color: var(--text); margin: 0 0 16px; }
+.cmp-delta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+.cmp-delta-item {
+  background: var(--bg3); border-radius: 10px; padding: 12px 14px;
+  border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px;
+}
+.cmp-delta-item .di-label { font-size: 0.68rem; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; }
+.cmp-delta-item .di-from { font-size: 0.75rem; color: var(--text3); }
+.cmp-delta-item .di-arrow { font-size: 0.78rem; color: var(--text3); }
+.cmp-delta-item .di-to   { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+.cmp-delta-item.improved .di-to { color: var(--low); }
+.cmp-delta-item.worsened .di-to { color: var(--high); }
+.cmp-delta-item.neutral  .di-to { color: var(--text2); }
+.cmp-delta-item .di-badge {
+  font-size: 0.65rem; font-weight: 700; padding: 1px 7px; border-radius: 10px;
+  margin-top: 2px; display: inline-block; width: fit-content;
+}
+.improved .di-badge { background: rgba(79,255,176,.12); color: var(--low); border: 1px solid rgba(79,255,176,.3); }
+.worsened .di-badge { background: rgba(255,79,123,.1);  color: var(--high); border: 1px solid rgba(255,79,123,.3); }
+.neutral  .di-badge { background: rgba(255,184,79,.08); color: var(--medium); border: 1px solid rgba(255,184,79,.25); }
+
+/* ── States ──────────────────────────────────────────────────── */
+.cmp-empty {
+  text-align: center; padding: 48px 20px; color: var(--text3);
+  background: var(--surface); border: 1.5px dashed var(--border);
+  border-radius: 16px; margin-bottom: 28px;
+}
+.cmp-empty .ce-icon { font-size: 2.5rem; margin-bottom: 10px; }
+.cmp-empty p { font-size: 0.88rem; line-height: 1.65; }
+.cmp-empty strong { color: var(--accent2); }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .cmp-sides { grid-template-columns: 1fr; }
+  .cmp-delta-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .cmp-delta-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body class="app-page">
+
+<nav class="navbar">
+  <a href="/app/dashboard.html" class="nav-brand">
+    <div class="logo-icon sm"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#4fffb0" stroke-width="2"/><path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="#4fffb0" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="20" cy="20" r="3" fill="#4fffb0"/></svg></div>
+    <span>OnchoScan</span>
+  </a>
+  <div class="nav-links">
+    <a href="/app/home.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>Home</a>
+    <a href="/app/dashboard.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>Predict</a>
+    <a href="/app/batch.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/></svg>Batch</a>
+    <a href="/app/history.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>History</a>
+    <a href="/app/compare.html" class="nav-link active"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"/></svg>Compare</a>
+    <a href="/app/analytics.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>Analytics</a>
+    <a href="/app/about.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>About</a>
+  </div>
+  <div class="nav-user">
+    <button class="theme-toggle" id="themeToggle" type="button" title="Switch to light mode">☀️</button>
+    <button class="notif-bell" id="notifBell" type="button" title="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="notif-badge" id="notifBadge"></span>
+    </button>
+    <span class="user-avatar" id="navAvatar">?</span>
+    <span id="navUsername" class="nav-uname"></span>
+    <button type="button" class="btn-logout" id="logoutBtn">Sign out</button>
+  </div>
+</nav>
+
+<main class="main-container">
+  <section class="page-hero">
+    <h1>Scan <em>Comparison</em></h1>
+    <p>Select a patient and compare two scans side-by-side to track changes over time.</p>
+  </section>
+
+  <div class="cmp-container">
+
+    <!-- Step 1: Patient selector -->
+    <div class="cmp-select-card">
+      <h3>Step 1 — Select Patient</h3>
+      <div class="cmp-select-row">
+        <div class="cmp-field">
+          <label>Patient Name</label>
+          <select class="cmp-select" id="patientSelect">
+            <option value="">Loading patients…</option>
+          </select>
+        </div>
+        <button class="btn-load-patient" id="btnLoadPatient" type="button" disabled>
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/></svg>
+          Load Scans
+        </button>
+      </div>
+    </div>
+
+    <!-- No patients state -->
+    <div class="cmp-empty" id="cmpNoPatients" style="display:none">
+      <div class="ce-icon">👤</div>
+      <p>No patients with saved scans found.<br>Run a prediction with <strong>Patient Name</strong> filled in, then come back here to compare scans.</p>
+    </div>
+
+    <!-- Step 2: Timeline -->
+    <div class="cmp-timeline-wrap" id="cmpTimelineWrap">
+      <div class="cmp-timeline-header">
+        <h3 id="cmpTimelineTitle">Scans for Patient</h3>
+        <span class="cmp-timeline-hint">1st click = <strong>Scan A</strong> · 2nd click = <strong>Scan B</strong> · click selected card to deselect</span>
+      </div>
+      <div class="cmp-timeline" id="cmpTimeline"></div>
+    </div>
+
+    <!-- Step 3: Action bar -->
+    <div class="cmp-action-bar" id="cmpActionBar">
+      <button class="btn-compare" id="btnCompare" type="button" disabled>
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"/></svg>
+        Compare Selected Scans
+      </button>
+      <button class="btn-clear-sel" id="btnClearSel" type="button">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        Clear Selection
+      </button>
+    </div>
+
+    <!-- Step 4: Comparison panel -->
+    <div class="cmp-panel" id="cmpPanel">
+      <div class="cmp-panel-header">
+        <h3>Comparison Results</h3>
+        <button class="btn-reset-cmp" id="btnResetCmp" type="button">← New Comparison</button>
+      </div>
+
+      <!-- Change summary strip -->
+      <div class="cmp-delta" id="cmpDelta">
+        <h4>📊 Changes: Scan A → Scan B</h4>
+        <div class="cmp-delta-grid" id="cmpDeltaGrid"></div>
+      </div>
+
+      <!-- Side-by-side -->
+      <div class="cmp-sides">
+        <div class="cmp-side" id="sideA"></div>
+        <div class="cmp-side" id="sideB"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer"><div class="footer-inner">
+  <div class="footer-brand"><div class="logo-icon sm"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#4fffb0" stroke-width="2"/><path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="#4fffb0" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="20" cy="20" r="3" fill="#4fffb0"/></svg></div>OnchoScan</div>
+  <p class="footer-disclaimer">⚠ For research and educational use only.</p>
+  <p class="footer-copy">© 2025 OnchoScan · Powered by ResNet18 + Grad-CAM</p>
+</div></footer>
+
+<script src="app.js"></script>
+<script>
+(function() {
+  var API = "http://127.0.0.1:8000";
+  var tk  = localStorage.getItem("oncho_token");
+  if (!tk) return;
+
+  function authHdr() { return { "Authorization": "Bearer " + tk }; }
+  function esc(s) {
+    return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+  function fmtDate(ts) {
+    try { return new Date(ts).toLocaleString(undefined, {year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}); }
+    catch(e) { return ts; }
+  }
+
+  var patientSelect  = document.getElementById("patientSelect");
+  var btnLoadPatient = document.getElementById("btnLoadPatient");
+  var cmpNoPatients  = document.getElementById("cmpNoPatients");
+  var cmpTimelineWrap= document.getElementById("cmpTimelineWrap");
+  var cmpTimelineTitle= document.getElementById("cmpTimelineTitle");
+  var cmpTimeline    = document.getElementById("cmpTimeline");
+  var cmpActionBar   = document.getElementById("cmpActionBar");
+  var btnCompare     = document.getElementById("btnCompare");
+  var btnClearSel    = document.getElementById("btnClearSel");
+  var cmpPanel       = document.getElementById("cmpPanel");
+  var cmpDeltaGrid   = document.getElementById("cmpDeltaGrid");
+  var sideA          = document.getElementById("sideA");
+  var sideB          = document.getElementById("sideB");
+  var btnResetCmp    = document.getElementById("btnResetCmp");
+
+  var allScans = [];
+  var selA = null;  // index into allScans
+  var selB = null;
+
+  // ── 1. Load patients on page load ────────────────────────────
+  (async function loadPatients() {
+    try {
+      var res  = await fetch(API + "/history/patients", { headers: authHdr() });
+      if (res.status === 401) { window.logout(); return; }
+      var data = await res.json();
+      var pts  = data.patients || [];
+
+      if (pts.length === 0) {
+        patientSelect.innerHTML = "<option value=''>No patients found</option>";
+        cmpNoPatients.style.display = "block";
+        return;
+      }
+      patientSelect.innerHTML = "<option value=''>— Select a patient —</option>" +
+        pts.map(function(p) { return "<option value='" + esc(p) + "'>" + esc(p) + "</option>"; }).join("");
+      btnLoadPatient.disabled = false;
+    } catch(e) {
+      patientSelect.innerHTML = "<option value=''>Error loading patients</option>";
+    }
+  })();
+
+  patientSelect.addEventListener("change", function() {
+    btnLoadPatient.disabled = !this.value;
+    resetAll();
+  });
+
+  // ── 2. Load scans for selected patient ───────────────────────
+  btnLoadPatient.addEventListener("click", async function() {
+    var pname = patientSelect.value;
+    if (!pname) return;
+    btnLoadPatient.disabled = true;
+    btnLoadPatient.textContent = "Loading…";
+
+    try {
+      var res  = await fetch(API + "/history/patient/" + encodeURIComponent(pname), { headers: authHdr() });
+      if (res.status === 401) { window.logout(); return; }
+      var data = await res.json();
+      allScans = data.scans || [];
+
+      if (allScans.length < 2) {
+        cmpTimelineWrap.style.display = "none";
+        cmpNoPatients.style.display = "block";
+        cmpNoPatients.querySelector("p").innerHTML =
+          "<strong>" + esc(pname) + "</strong> only has " + allScans.length +
+          " scan on record.<br>Run at least <strong>2 scans</strong> for this patient to enable comparison.";
+        return;
+      }
+
+      cmpNoPatients.style.display = "none";
+      cmpTimelineTitle.textContent = "Scans for " + pname + " (" + allScans.length + " total)";
+      renderTimeline();
+      cmpTimelineWrap.style.display = "block";
+      cmpActionBar.style.display = "flex";
+    } catch(e) {
+      alert("Error loading scans: " + e.message);
+    } finally {
+      btnLoadPatient.disabled = false;
+      btnLoadPatient.innerHTML = '<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/></svg> Load Scans';
+    }
+  });
+
+  // ── Render timeline cards ─────────────────────────────────────
+  function renderTimeline() {
+    cmpTimeline.innerHTML = allScans.map(function(sc, i) {
+      var rc = sc.risk_level === "High Risk" ? "high" : sc.risk_level === "Medium Risk" ? "medium" : "low";
+      var typeIcon = sc.cancer_type === "brain" ? "🧠" : "🔬";
+      var isSel = (i === selA || i === selB);
+      var cls = i === selA ? " selected-a" : i === selB ? " selected-b" : "";
+      return (
+        '<div class="cmp-scan-card' + cls + '" data-idx="' + i + '">' +
+          '<div class="cmp-scan-num">' + (i + 1) + '</div>' +
+          '<div class="cmp-scan-body">' +
+            '<div class="sc-pred">' + typeIcon + ' ' + esc(sc.prediction) +
+              '<span class="risk-chip ' + rc + '" style="font-size:.65rem;padding:2px 8px">' + esc(sc.risk_level) + '</span>' +
+            '</div>' +
+            '<div class="sc-date">' + esc(fmtDate(sc.timestamp)) + ' · ' + esc(sc.cancer_type.toUpperCase()) + '</div>' +
+          '</div>' +
+          '<div class="cmp-scan-right">' +
+            '<span class="cmp-scan-conf">' + esc(String(sc.confidence)) + '%</span>' +
+            '<span class="cmp-sel-badge badge-a">Scan A</span>' +
+            '<span class="cmp-sel-badge badge-b">Scan B</span>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join("");
+
+    // Wire clicks
+    cmpTimeline.querySelectorAll(".cmp-scan-card").forEach(function(card) {
+      card.addEventListener("click", function() {
+        var idx = parseInt(this.dataset.idx, 10);
+        if (idx === selA) { selA = null; }
+        else if (idx === selB) { selB = null; }
+        else if (selA === null) { selA = idx; }
+        else if (selB === null) { selB = idx; }
+        else { selB = idx; } // replace B if both already selected
+        renderTimeline();
+        updateCompareBtn();
+      });
+    });
+  }
+
+  function updateCompareBtn() {
+    btnCompare.disabled = (selA === null || selB === null);
+  }
+
+  // ── Clear selection ───────────────────────────────────────────
+  btnClearSel.addEventListener("click", function() {
+    selA = null; selB = null;
+    renderTimeline();
+    updateCompareBtn();
+    cmpPanel.style.display = "none";
+  });
+
+  // ── Run comparison ────────────────────────────────────────────
+  btnCompare.addEventListener("click", function() {
+    if (selA === null || selB === null) return;
+    // Respect user's exact selection — selA is Scan A, selB is Scan B
+    var scanA = allScans[selA];
+    var scanB = allScans[selB];
+    renderComparison(scanA, scanB);
+    cmpPanel.style.display = "block";
+    cmpPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // ── Reset ─────────────────────────────────────────────────────
+  btnResetCmp.addEventListener("click", function() {
+    cmpPanel.style.display = "none";
+    selA = null; selB = null;
+    renderTimeline();
+    updateCompareBtn();
+    cmpTimelineWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  function resetAll() {
+    selA = null; selB = null; allScans = [];
+    cmpPanel.style.display = "none";
+    cmpTimelineWrap.style.display = "none";
+    cmpActionBar.style.display = "none";
+    cmpNoPatients.style.display = "none";
+  }
+
+  // ── Build a side panel ────────────────────────────────────────
+  function buildSide(sc, label, labelCls, otherSc) {
+    var rc = sc.risk_level === "High Risk" ? "high" : sc.risk_level === "Medium Risk" ? "medium" : "low";
+    var predChanged = otherSc && sc.prediction !== otherSc.prediction;
+
+    // Confidence bar colour
+    var confColor = rc === "high" ? "#ff4f7b" : rc === "medium" ? "#ffb84f" : "#4fffb0";
+
+    // Class probs
+    var probsHtml = "";
+    if (sc.cancer_type) {
+      var classes = sc.cancer_type === "brain"
+        ? ["glioma","meningioma","notumor","pituitary"]
+        : ["benign","malignant"];
+      // Try to parse stored class_probabilities — stored as JSON string or not stored
+      // Fall back to confidence on predicted class
+      probsHtml = classes.map(function(cls) {
+        var isPred = cls === (sc.prediction || "").toLowerCase().replace(" ","");
+        var pct = isPred ? sc.confidence : 0;
+        return (
+          '<div class="cmp-prob-row">' +
+            '<span class="cmp-prob-name">' + esc(cls.charAt(0).toUpperCase() + cls.slice(1)) + '</span>' +
+            '<div class="cmp-prob-bg"><div class="cmp-prob-fill" style="width:' + pct + '%;background:' + (isPred ? confColor : "var(--border2)") + '"></div></div>' +
+            '<span class="cmp-prob-pct">' + pct + '%</span>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    var imgsHtml = "";
+    if (sc.original || sc.heatmap) {
+      imgsHtml = '<div class="cmp-images">';
+      if (sc.original) imgsHtml += '<div class="cmp-img-wrap"><div class="cmp-img-label">Original</div><img src="' + API + "/" + esc(sc.original) + '" loading="lazy" alt="Original scan"></div>';
+      if (sc.heatmap)  imgsHtml += '<div class="cmp-img-wrap"><div class="cmp-img-label">Grad-CAM</div><img src="' + API + "/" + esc(sc.heatmap) + '" loading="lazy" alt="Heatmap"></div>';
+      imgsHtml += "</div>";
+    }
+
+    return (
+      '<div class="cmp-side-header">' +
+        '<span class="cmp-side-label ' + labelCls + '">' + label + '</span>' +
+        '<span class="cmp-side-date">' + esc(fmtDate(sc.timestamp)) + '</span>' +
+      '</div>' +
+      '<div class="cmp-side-body">' +
+        '<div>' +
+          '<div class="cmp-pred-row">' +
+            '<span class="cmp-pred-name' + (predChanged ? ' changed' : '') + '">' + esc(sc.prediction) + '</span>' +
+            '<span class="risk-chip ' + rc + '">' + esc(sc.risk_level) + '</span>' +
+          '</div>' +
+          (predChanged ? '<div style="font-size:.72rem;color:var(--accent3);margin-top:3px">⚠ Prediction changed</div>' : '') +
+        '</div>' +
+        '<div>' +
+          '<div class="cmp-conf-label">Confidence</div>' +
+          '<div class="cmp-conf-bar-bg"><div class="cmp-conf-bar-fill" style="width:' + sc.confidence + '%;background:' + confColor + '"></div></div>' +
+          '<div class="cmp-conf-val">' + sc.confidence + '%</div>' +
+        '</div>' +
+        (probsHtml ? '<div><div style="font-size:.75rem;color:var(--text3);margin-bottom:6px">Class Probabilities</div><div class="cmp-probs">' + probsHtml + '</div></div>' : '') +
+        imgsHtml +
+        (sc.report ? '<a href="' + API + '/' + esc(sc.report) + '" target="_blank" class="cmp-pdf-link">⬇ Download PDF Report</a>' : '') +
+      '</div>'
+    );
+  }
+
+  // ── Build delta strip ─────────────────────────────────────────
+  function buildDelta(scanA, scanB) {
+    var items = [];
+
+    // Prediction change
+    var predSame = scanA.prediction === scanB.prediction;
+    items.push({
+      label: "Prediction",
+      from: scanA.prediction,
+      to: scanB.prediction,
+      cls: predSame ? "neutral" : "worsened",
+      badge: predSame ? "No change" : "Changed"
+    });
+
+    // Confidence change
+    var confDiff = Math.round((scanB.confidence - scanA.confidence) * 10) / 10;
+    var confCls = confDiff === 0 ? "neutral" : confDiff > 0 ? "worsened" : "improved";
+    // increasing confidence on a bad pred is worsened; on good pred is improved
+    // simplify: if risk worsened, increase conf = worse
+    items.push({
+      label: "Confidence",
+      from: scanA.confidence + "%",
+      to: scanB.confidence + "%" + (confDiff !== 0 ? " (" + (confDiff > 0 ? "+" : "") + confDiff + "%)" : ""),
+      cls: confDiff === 0 ? "neutral" : "neutral",
+      badge: confDiff > 0 ? "+" + confDiff + "%" : confDiff < 0 ? confDiff + "%" : "No change"
+    });
+
+    // Risk level change
+    var riskOrder = { "Low Risk": 0, "Medium Risk": 1, "High Risk": 2 };
+    var rDiff = (riskOrder[scanB.risk_level] || 0) - (riskOrder[scanA.risk_level] || 0);
+    items.push({
+      label: "Risk Level",
+      from: scanA.risk_level,
+      to: scanB.risk_level,
+      cls: rDiff > 0 ? "worsened" : rDiff < 0 ? "improved" : "neutral",
+      badge: rDiff > 0 ? "Escalated ↑" : rDiff < 0 ? "Improved ↓" : "Stable"
+    });
+
+    // Cancer type
+    items.push({
+      label: "Cancer Type",
+      from: scanA.cancer_type.toUpperCase(),
+      to: scanB.cancer_type.toUpperCase(),
+      cls: "neutral",
+      badge: scanA.cancer_type === scanB.cancer_type ? "Same" : "Different"
+    });
+
+    // Time between scans
+    try {
+      var ms   = new Date(scanB.timestamp) - new Date(scanA.timestamp);
+      var days = Math.round(ms / 86400000);
+      items.push({ label: "Time Between Scans", from: fmtDate(scanA.timestamp), to: fmtDate(scanB.timestamp), cls: "neutral", badge: days + " day" + (days !== 1 ? "s" : "") });
+    } catch(e) {}
+
+    cmpDeltaGrid.innerHTML = items.map(function(item) {
+      return (
+        '<div class="cmp-delta-item ' + item.cls + '">' +
+          '<div class="di-label">' + esc(item.label) + '</div>' +
+          '<div class="di-from">' + esc(item.from) + '</div>' +
+          '<div class="di-arrow">→</div>' +
+          '<div class="di-to">' + esc(item.to) + '</div>' +
+          '<span class="di-badge">' + esc(item.badge) + '</span>' +
+        '</div>'
+      );
+    }).join("");
+  }
+
+  // ── Render full comparison ────────────────────────────────────
+  function renderComparison(scanA, scanB) {
+    sideA.innerHTML = buildSide(scanA, "Scan A", "lbl-a", scanB);
+    sideB.innerHTML = buildSide(scanB, "Scan B", "lbl-b", scanA);
+    buildDelta(scanA, scanB);
+  }
+
+})();
+</script>
+<script src="features.js"></script>
+</body>
+</html>

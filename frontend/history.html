@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function(){
+  if(localStorage.getItem("oncho_theme")==="light")
+    document.documentElement.classList.add("preload-light");
+})();
+</script>
+<style>html.preload-light body { background:#f2f8f5 !important; }</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnchoScan - History</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.hist-filter-card {
+  margin: 0 auto 18px;
+  max-width: 900px;
+  padding: 18px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: end;
+  justify-content: space-between;
+}
+.hist-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+  min-width: 240px;
+}
+.hist-filter-field label,
+.hist-summary-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.hist-patient-select {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--bg3);
+  color: var(--text1);
+  font-size: 0.88rem;
+  font-family: inherit;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color .15s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a6980' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
+}
+.hist-patient-select:focus { outline: none; border-color: var(--accent2); }
+.hist-filter-note {
+  font-size: 0.8rem;
+  color: var(--text3);
+  line-height: 1.55;
+  max-width: 380px;
+}
+.hist-summary {
+  margin: 0 auto 18px;
+  max-width: 900px;
+  padding: 18px 20px;
+  display: none;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.hist-summary-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+.hist-summary-value {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text1);
+  margin-top: 5px;
+  line-height: 1.35;
+}
+.hist-toolbar {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 4px 14px;
+  flex-wrap:wrap;
+}
+.hist-toolbar-left  { display:flex; align-items:center; gap:8px; flex:1; }
+.hist-toolbar-right { display:flex; align-items:center; gap:8px; }
+.btn-sel-all {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:0.8rem;
+  font-weight:600;
+  padding:6px 12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--bg3);
+  color:var(--text2);
+  cursor:pointer;
+  transition:all .15s;
+}
+.btn-sel-all:hover { border-color:var(--accent2); color:var(--accent2); }
+.sel-count {
+  font-size:0.8rem;
+  color:var(--text3);
+  background:var(--bg3);
+  border-radius:20px;
+  padding:4px 10px;
+  border:1px solid var(--border);
+  transition:all .2s;
+}
+.sel-count.has-sel {
+  background:rgba(79,255,176,.1);
+  border-color:rgba(79,255,176,.3);
+  color:var(--accent);
+}
+.btn-delete-sel {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:0.8rem;
+  font-weight:600;
+  padding:6px 14px;
+  border-radius:8px;
+  border:1px solid rgba(255,79,123,.35);
+  background:rgba(255,79,123,.08);
+  color:#ff4f7b;
+  cursor:pointer;
+  transition:all .15s;
+  opacity:0;
+  pointer-events:none;
+}
+.btn-delete-sel.visible { opacity:1; pointer-events:auto; }
+.btn-delete-sel:hover { background:rgba(255,79,123,.18); border-color:#ff4f7b; }
+.btn-delete-sel:disabled { opacity:.5; cursor:not-allowed; }
+.history-row {
+  display:grid;
+  grid-template-columns:auto auto minmax(0,1fr) auto auto;
+  gap:12px;
+  align-items:start;
+  padding:14px 10px;
+  border-bottom:1px solid var(--border);
+  border-radius:10px;
+  transition:background .12s;
+  cursor:default;
+}
+.history-row:last-child { border-bottom:none; }
+.history-row:hover { background:var(--bg3); }
+.history-row.selected { background:rgba(79,255,176,.06); }
+.row-check {
+  width:18px;
+  height:18px;
+  min-width:18px;
+  border-radius:5px;
+  border:1.5px solid var(--border);
+  background:var(--bg3);
+  cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+  transition:all .12s;
+  margin:0;
+}
+.row-check:checked {
+  background:var(--accent);
+  border-color:var(--accent);
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 12 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 5l3.5 3.5L11 1' stroke='%23050d15' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:10px;
+}
+.row-check:hover { border-color:var(--accent2); }
+.hist-icon  { font-size:1.4rem; flex-shrink:0; }
+.hist-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hist-info strong {
+  display:block;
+  font-size:0.9rem;
+  color:var(--text1);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.hist-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hist-subline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  color: var(--text3);
+}
+.hist-patient-chip,
+.hist-type-chip {
+  font-size: .65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+.hist-patient-chip {
+  background: rgba(0,212,255,.12);
+  color: #00d4ff;
+  border-color: rgba(0,212,255,.25);
+}
+.hist-type-chip.single {
+  background: rgba(79,255,176,.1);
+  color: #4fffb0;
+  border-color: rgba(79,255,176,.2);
+}
+.hist-type-chip.batch {
+  background: rgba(255,184,79,.12);
+  color: #ffb84f;
+  border-color: rgba(255,184,79,.25);
+}
+.hist-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.hist-detail-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 12px;
+}
+.hist-detail-card b,
+.hist-note-box b {
+  display: block;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text3);
+  margin-bottom: 5px;
+}
+.hist-detail-card span {
+  font-size: .84rem;
+  color: var(--text1);
+  word-break: break-word;
+}
+.hist-note-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: var(--text2);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.hist-patient-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.hist-meta-pill {
+  font-size: 0.72rem;
+  color: var(--text2);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 9px;
+}
+.hist-conf  {
+  font-size:0.85rem;
+  font-weight:600;
+  color:var(--accent2);
+  flex-shrink:0;
+}
+.hist-download {
+  font-size:0.75rem;
+  font-weight:600;
+  padding:4px 10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--bg3);
+  color:var(--text2);
+  text-decoration:none;
+  flex-shrink:0;
+  white-space:nowrap;
+  transition:all .12s;
+}
+.hist-download:hover { border-color:var(--accent2); color:var(--accent2); }
+.del-modal-overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s;
+}
+.del-modal-overlay.open { opacity:1; pointer-events:auto; }
+.del-modal {
+  background:var(--bg2);
+  border:1px solid rgba(255,79,123,.3);
+  border-radius:16px;
+  padding:28px 28px 24px;
+  width:100%;
+  max-width:380px;
+  text-align:center;
+  transform:translateY(12px);
+  transition:transform .2s;
+}
+.del-modal-overlay.open .del-modal { transform:translateY(0); }
+.del-modal-icon { font-size:2.2rem; margin-bottom:10px; }
+.del-modal h3 { font-size:1.1rem; color:var(--text1); margin:0 0 8px; }
+.del-modal p { font-size:0.85rem; color:var(--text3); margin:0 0 20px; line-height:1.55; }
+.del-modal-btns { display:flex; gap:10px; justify-content:center; }
+.btn-modal-cancel {
+  padding:8px 20px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--bg3);
+  color:var(--text2);
+  font-size:0.85rem;
+  font-weight:600;
+  cursor:pointer;
+}
+.btn-modal-cancel:hover { border-color:var(--accent2); color:var(--accent2); }
+.btn-modal-confirm {
+  padding:8px 20px;
+  border-radius:8px;
+  border:1px solid rgba(255,79,123,.4);
+  background:rgba(255,79,123,.12);
+  color:#ff4f7b;
+  font-size:0.85rem;
+  font-weight:600;
+  cursor:pointer;
+}
+.btn-modal-confirm:hover { background:rgba(255,79,123,.22); }
+.btn-modal-confirm:disabled { opacity:.5; cursor:not-allowed; }
+@media (max-width: 820px) {
+  .history-row {
+    grid-template-columns:auto auto minmax(0,1fr);
+  }
+  .hist-conf,
+  .hist-download,
+  .risk-chip {
+    grid-column: 3;
+    width: fit-content;
+  }
+}
+</style>
+</head>
+<body class="app-page">
+
+<nav class="navbar">
+  <a href="/app/dashboard.html" class="nav-brand">
+    <div class="logo-icon sm"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#4fffb0" stroke-width="2"/><path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="#4fffb0" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="20" cy="20" r="3" fill="#4fffb0"/></svg></div>
+    <span>OnchoScan</span>
+  </a>
+  <div class="nav-links">
+    <a href="/app/home.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>Home</a>
+    <a href="/app/dashboard.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>Predict</a>
+    <a href="/app/batch.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/></svg>Batch</a>
+    <a href="/app/history.html" class="nav-link active"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>History</a>
+    <a href="/app/compare.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"/></svg>Compare</a>
+    <a href="/app/analytics.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>Analytics</a>
+    <a href="/app/about.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>About</a>
+  </div>
+  <div class="nav-user">
+    <button class="theme-toggle" id="themeToggle" type="button" title="Switch to light mode">☀️</button>
+    <button class="notif-bell" id="notifBell" type="button" title="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="notif-badge" id="notifBadge"></span>
+    </button>
+    <span class="user-avatar" id="navAvatar">?</span>
+    <span id="navUsername" class="nav-uname"></span>
+    <button type="button" class="btn-logout" id="logoutBtn">Sign out</button>
+  </div>
+</nav>
+
+<main class="main-container">
+  <section class="page-hero">
+    <h1>Prediction <em>History</em></h1>
+    <p>Select a patient and review each patient&apos;s full scan history separately.</p>
+  </section>
+
+  <div class="card hist-filter-card">
+    <div class="hist-filter-field">
+      <label for="patientFilter">Patient History View</label>
+      <select id="patientFilter" class="hist-patient-select">
+        <option value="__loading__">Loading patients...</option>
+      </select>
+    </div>
+    <div class="hist-filter-note" id="filterHint">
+      Switch between all scans, named patients, or unassigned records to see each patient&apos;s saved history separately.
+    </div>
+  </div>
+
+  <div class="card hist-summary" id="patientSummary"></div>
+
+  <div class="card" style="max-width:900px;margin:0 auto">
+    <div class="card-header">
+      <h3>Past Analyses</h3>
+      <span id="historyCount" class="count-badge">Loading...</span>
+    </div>
+
+    <div class="hist-toolbar" id="histToolbar" style="display:none">
+      <div class="hist-toolbar-left">
+        <button class="btn-sel-all" id="btnSelAll" type="button">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <span id="selAllLabel">Select All</span>
+        </button>
+        <span class="sel-count" id="selCount">0 selected</span>
+      </div>
+      <div class="hist-toolbar-right">
+        <button class="btn-delete-sel" id="btnDeleteSel" type="button">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          Delete Selected
+        </button>
+      </div>
+    </div>
+
+    <div id="historyContent">
+      <div class="empty-state"><div class="empty-icon">⏳</div><p>Loading...</p></div>
+    </div>
+  </div>
+</main>
+
+<div class="del-modal-overlay" id="delModalOverlay">
+  <div class="del-modal">
+    <div class="del-modal-icon">🗑️</div>
+    <h3 id="delModalTitle">Delete Records</h3>
+    <p id="delModalMsg">This will permanently delete the selected records. This cannot be undone.</p>
+    <div class="del-modal-btns">
+      <button class="btn-modal-cancel" id="delModalCancel" type="button">Cancel</button>
+      <button class="btn-modal-confirm" id="delModalConfirm" type="button">Delete</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer"><div class="footer-inner">
+  <div class="footer-brand"><div class="logo-icon sm"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#4fffb0" stroke-width="2"/><path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="#4fffb0" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="20" cy="20" r="3" fill="#4fffb0"/></svg></div>OnchoScan</div>
+  <p class="footer-disclaimer">⚠ For research and educational use only.</p>
+  <p class="footer-copy">© 2025 OnchoScan · Powered by ResNet18 + Grad-CAM</p>
+</div></footer>
+
+<script src="app.js"></script>
+<script>
+(async function() {
+  var API = "http://127.0.0.1:8000";
+  var tk  = localStorage.getItem("oncho_token");
+  if (!tk) return;
+
+  var allRows      = [];
+  var visibleRows  = [];
+  var selected     = new Set();
+  var activeFilter = "__all__";
+
+  var histContent    = document.getElementById("historyContent");
+  var histCount      = document.getElementById("historyCount");
+  var patientFilter  = document.getElementById("patientFilter");
+  var patientSummary = document.getElementById("patientSummary");
+  var filterHint     = document.getElementById("filterHint");
+  var histToolbar    = document.getElementById("histToolbar");
+  var btnSelAll      = document.getElementById("btnSelAll");
+  var selAllLabel    = document.getElementById("selAllLabel");
+  var selCountEl     = document.getElementById("selCount");
+  var btnDeleteSel   = document.getElementById("btnDeleteSel");
+  var delOverlay     = document.getElementById("delModalOverlay");
+  var delTitle       = document.getElementById("delModalTitle");
+  var delMsg         = document.getElementById("delModalMsg");
+  var delCancel      = document.getElementById("delModalCancel");
+  var delConfirm     = document.getElementById("delModalConfirm");
+
+  function authHdr() { return { "Authorization": "Bearer " + tk }; }
+  function esc(s) {
+    return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+  function fmtDate(ts) {
+    try {
+      return new Date(ts).toLocaleString(undefined, {
+        year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"
+      });
+    } catch (e) {
+      return ts || "Unknown";
+    }
+  }
+  function getPatientName(row) {
+    return (row.patient_name || "").trim();
+  }
+  function getUniqueNamedPatientCount() {
+    var seen = {};
+    allRows.forEach(function(row) {
+      var name = getPatientName(row);
+      if (name) seen[name] = true;
+    });
+    return Object.keys(seen).length;
+  }
+  function getFilteredRows() {
+    if (activeFilter === "__all__") return allRows.slice();
+    if (activeFilter === "__unassigned__") {
+      return allRows.filter(function(r) { return !getPatientName(r); });
+    }
+    return allRows.filter(function(r) { return getPatientName(r) === activeFilter; });
+  }
+
+  function buildFilterOptions() {
+    var counts = {};
+    var unnamed = 0;
+
+    allRows.forEach(function(r) {
+      var name = getPatientName(r);
+      if (!name) {
+        unnamed += 1;
+        return;
+      }
+      counts[name] = (counts[name] || 0) + 1;
+    });
+
+    var names = Object.keys(counts).sort(function(a, b) { return a.localeCompare(b); });
+    var html = [
+      "<option value='__all__'>All patients and scans (" + allRows.length + ")</option>"
+    ];
+
+    names.forEach(function(name) {
+      html.push("<option value='" + esc(name) + "'>" + esc(name) + " (" + counts[name] + ")</option>");
+    });
+
+    if (unnamed > 0) {
+      html.push("<option value='__unassigned__'>Unassigned patient records (" + unnamed + ")</option>");
+    }
+
+    patientFilter.innerHTML = html.join("");
+
+    if (activeFilter !== "__all__" && activeFilter !== "__unassigned__" && !counts[activeFilter]) {
+      activeFilter = "__all__";
+    }
+    if (activeFilter === "__unassigned__" && unnamed === 0) {
+      activeFilter = "__all__";
+    }
+    patientFilter.value = activeFilter;
+  }
+
+  function renderSummary(list) {
+    patientSummary.style.display = "grid";
+
+    if (activeFilter === "__all__") {
+      patientSummary.innerHTML =
+        '<div class="hist-summary-item"><span class="hist-summary-label">View</span><span class="hist-summary-value">All Patients</span></div>' +
+        '<div class="hist-summary-item"><span class="hist-summary-label">Named Patients</span><span class="hist-summary-value">' + getUniqueNamedPatientCount() + '</span></div>' +
+        '<div class="hist-summary-item"><span class="hist-summary-label">Scans Shown</span><span class="hist-summary-value">' + list.length + '</span></div>' +
+        '<div class="hist-summary-item"><span class="hist-summary-label">Latest Scan</span><span class="hist-summary-value">' + esc(list[0] ? fmtDate(list[0].timestamp) : "None") + '</span></div>';
+      filterHint.textContent = "Choose a patient from the dropdown to isolate that patient's full saved history, notes, and scan details.";
+      return;
+    }
+
+    if (activeFilter === "__unassigned__") {
+      patientSummary.innerHTML =
+        '<div class="hist-summary-item"><span class="hist-summary-label">View</span><span class="hist-summary-value">Unassigned Records</span></div>' +
+        '<div class="hist-summary-item"><span class="hist-summary-label">Scans Shown</span><span class="hist-summary-value">' + list.length + '</span></div>' +
+        '<div class="hist-summary-item"><span class="hist-summary-label">Latest Scan</span><span class="hist-summary-value">' + esc(list[0] ? fmtDate(list[0].timestamp) : "None") + '</span></div>' +
+        '<div class="hist-summary-item"><span class="hist-summary-label">Patient Name</span><span class="hist-summary-value">Not saved</span></div>';
+      filterHint.textContent = "These records were saved without a patient name, so they cannot be separated on the Compare page yet.";
+      return;
+    }
+
+    var latest = list[0] || {};
+    var savedAges = [];
+    var savedSexes = [];
+    var seenAges = {};
+    var seenSexes = {};
+
+    list.forEach(function(r) {
+      if (r.patient_age && !seenAges[r.patient_age]) {
+        seenAges[r.patient_age] = true;
+        savedAges.push(r.patient_age);
+      }
+      if (r.patient_sex && !seenSexes[r.patient_sex]) {
+        seenSexes[r.patient_sex] = true;
+        savedSexes.push(r.patient_sex);
+      }
+    });
+
+    patientSummary.innerHTML =
+      '<div class="hist-summary-item"><span class="hist-summary-label">Patient</span><span class="hist-summary-value">' + esc(activeFilter) + '</span></div>' +
+      '<div class="hist-summary-item"><span class="hist-summary-label">Total Scans</span><span class="hist-summary-value">' + list.length + '</span></div>' +
+      '<div class="hist-summary-item"><span class="hist-summary-label">Latest Scan</span><span class="hist-summary-value">' + esc(latest.timestamp ? fmtDate(latest.timestamp) : "None") + '</span></div>' +
+      '<div class="hist-summary-item"><span class="hist-summary-label">Saved Demographics</span><span class="hist-summary-value">' +
+        esc((savedAges.length ? savedAges.join(", ") + " yrs" : "Age -") + " / " + (savedSexes.length ? savedSexes.join(", ") : "Sex -")) +
+      '</span></div>';
+
+    filterHint.textContent = "You are viewing only " + activeFilter + "'s saved history. Every record below includes the stored patient information and report link.";
+  }
+
+  function renderRows(list) {
+    if (list.length === 0) {
+      var emptyMessage = activeFilter === "__all__"
+        ? "No predictions yet."
+        : activeFilter === "__unassigned__"
+        ? "No unassigned records found."
+        : "No saved history found for " + activeFilter + ".";
+
+      histContent.innerHTML =
+        '<div class="empty-state"><div class="empty-icon">🔬</div><p>' + esc(emptyMessage) + '</p><a href="/app/dashboard.html" class="btn-primary" style="display:inline-flex;margin-top:12px">Go to Dashboard</a></div>';
+      histToolbar.style.display = "none";
+      return;
+    }
+
+    histToolbar.style.display = "flex";
+    histContent.innerHTML = list.map(function(r) {
+      var rc       = r.risk_level === "High Risk" ? "high" : r.risk_level === "Medium Risk" ? "medium" : "low";
+      var dt       = fmtDate(r.timestamp);
+      var isBatch  = r.analysis_type === "batch";
+      var typeIcon = r.cancer_type === "brain" ? "🧠" : "🔬";
+      var patientName = getPatientName(r);
+      var symptoms = (r.patient_symptoms || "").split(",").map(function(s) { return s.trim(); }).filter(Boolean).join(", ");
+      var ageSex = (r.patient_age || "-") + " / " + (r.patient_sex || "-");
+      var isChecked = selected.has(r.id) ? "checked" : "";
+      var selCls    = selected.has(r.id) ? " selected" : "";
+
+      return (
+        '<div class="history-row' + selCls + '" data-id="' + esc(r.id) + '">' +
+          '<input type="checkbox" class="row-check" data-id="' + esc(r.id) + '" ' + isChecked + '>' +
+          '<div class="hist-icon">' + typeIcon + '</div>' +
+          '<div class="hist-main">' +
+            '<div class="hist-topline">' +
+              '<div class="hist-info">' +
+                '<strong>' + esc(r.prediction) + '</strong>' +
+                '<div class="hist-subline">' +
+                  '<span>' + esc((r.cancer_type || "").toUpperCase()) + '</span>' +
+                  '<span>·</span>' +
+                  '<span>' + esc(dt) + '</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="hist-subline">' +
+                '<span class="hist-type-chip ' + (isBatch ? "batch" : "single") + '">' + (isBatch ? "BATCH" : "SINGLE") + '</span>' +
+                (patientName ? '<span class="hist-patient-chip">' + esc(patientName) + '</span>' : '') +
+              '</div>' +
+            '</div>' +
+            '<div class="hist-detail-grid">' +
+              '<div class="hist-detail-card"><b>Confidence</b><span>' + esc(String(r.confidence)) + '%</span></div>' +
+              '<div class="hist-detail-card"><b>Risk Level</b><span>' + esc(r.risk_level) + '</span></div>' +
+              '<div class="hist-detail-card"><b>Age / Sex</b><span>' + esc(ageSex) + '</span></div>' +
+              '<div class="hist-detail-card"><b>Symptoms</b><span>' + esc(symptoms || "No symptoms saved") + '</span></div>' +
+            '</div>' +
+            (r.patient_note
+              ? '<div class="hist-note-box"><b>Patient Note</b>' + esc(r.patient_note) + '</div>'
+              : '') +
+            (!patientName && !r.patient_age && !r.patient_sex && !symptoms && !r.patient_note
+              ? '<div class="hist-patient-meta"><span class="hist-meta-pill">No patient details saved for this scan</span></div>'
+              : '') +
+          '</div>' +
+          '<div class="hist-conf">' + esc(String(r.confidence)) + '%</div>' +
+          '<div class="risk-chip ' + rc + '">' + esc(r.risk_level) + '</div>' +
+          '<a href="' + API + '/' + esc(r.report) + '" target="_blank" class="hist-download">⬇ PDF</a>' +
+        '</div>'
+      );
+    }).join("");
+
+    histContent.querySelectorAll(".row-check").forEach(function(cb) {
+      cb.addEventListener("change", function() {
+        var id  = this.dataset.id;
+        var row = histContent.querySelector('.history-row[data-id="' + id + '"]');
+        if (this.checked) {
+          selected.add(id);
+          row.classList.add("selected");
+        } else {
+          selected.delete(id);
+          row.classList.remove("selected");
+        }
+        updateToolbar();
+      });
+    });
+
+    histContent.querySelectorAll(".history-row").forEach(function(row) {
+      row.addEventListener("click", function(e) {
+        if (e.target.classList.contains("row-check") || e.target.closest("a")) return;
+        var cb = row.querySelector(".row-check");
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event("change"));
+      });
+    });
+  }
+
+  function updateToolbar() {
+    var n   = selected.size;
+    var all = visibleRows.length;
+    selCountEl.textContent = n === 0 ? "0 selected" : n + " of " + all + " selected";
+    selCountEl.classList.toggle("has-sel", n > 0);
+    btnDeleteSel.classList.toggle("visible", n > 0);
+    selAllLabel.textContent = (n === all && all > 0) ? "Deselect All" : "Select All";
+  }
+
+  function refreshView() {
+    visibleRows = getFilteredRows();
+    selected = new Set(Array.from(selected).filter(function(id) {
+      return visibleRows.some(function(r) { return String(r.id) === String(id); });
+    }));
+    buildFilterOptions();
+    renderSummary(visibleRows);
+    histCount.textContent = visibleRows.length + " record" + (visibleRows.length !== 1 ? "s" : "");
+    renderRows(visibleRows);
+    updateToolbar();
+  }
+
+  patientFilter.addEventListener("change", function() {
+    activeFilter = this.value;
+    refreshView();
+  });
+
+  btnSelAll.addEventListener("click", function() {
+    var allSelected = selected.size === visibleRows.length && visibleRows.length > 0;
+    selected.clear();
+    if (!allSelected) {
+      visibleRows.forEach(function(r) { selected.add(r.id); });
+    }
+    renderRows(visibleRows);
+    updateToolbar();
+  });
+
+  btnDeleteSel.addEventListener("click", function() {
+    var n = selected.size;
+    delTitle.textContent = "Delete " + n + " Record" + (n !== 1 ? "s" : "") + "?";
+    delMsg.textContent   = "This will permanently remove " + n + " scan record" + (n !== 1 ? "s" : "") + " from this history view. This cannot be undone.";
+    delOverlay.classList.add("open");
+  });
+
+  function closeModal() { delOverlay.classList.remove("open"); }
+  delCancel.addEventListener("click", closeModal);
+  delOverlay.addEventListener("click", function(e) { if (e.target === delOverlay) closeModal(); });
+
+  delConfirm.addEventListener("click", async function() {
+    delConfirm.disabled = true;
+    delConfirm.textContent = "Deleting...";
+    try {
+      var ids = Array.from(selected);
+      var res = await fetch(API + "/history", {
+        method:  "DELETE",
+        headers: Object.assign({ "Content-Type": "application/json" }, authHdr()),
+        body:    JSON.stringify(ids)
+      });
+      if (res.status === 401) { window.logout(); return; }
+      if (!res.ok) throw new Error("Server error " + res.status);
+
+      allRows = allRows.filter(function(r) { return !selected.has(r.id); });
+      selected.clear();
+      refreshView();
+      closeModal();
+      if (window.Toast) window.Toast.success("Deleted", ids.length + " record" + (ids.length !== 1 ? "s" : "") + " removed.");
+    } catch(err) {
+      if (window.Toast) window.Toast.error("Error", err.message);
+      else alert("Error: " + err.message);
+    } finally {
+      delConfirm.disabled = false;
+      delConfirm.textContent = "Delete";
+    }
+  });
+
+  try {
+    var res  = await fetch(API + "/history", { headers: authHdr() });
+    if (res.status === 401) { window.logout(); return; }
+    var data = await res.json();
+    allRows  = data.history || [];
+    activeFilter = "__all__";
+    refreshView();
+  } catch(e) {
+    histCount.textContent = "Error";
+    patientFilter.innerHTML = "<option value='__error__'>Error loading history</option>";
+    histContent.innerHTML = "<p style='color:#e55;padding:20px'>Failed to load. Is the backend running?</p>";
+  }
+})();
+</script>
+<script src="features.js"></script>
+</body>
+</html>
