@@ -1,8 +1,6 @@
-"# Onchoscan
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-2.0%2B-green)](https://flask.palletsprojects.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-green)](https://fastapi.tiangolo.com/)
 
 ## Project Info
 
@@ -12,7 +10,6 @@
 **Current Version:** 1.0.0  
 **Last Updated:** May 2026
 
----
 
 ## Table of Contents
 
@@ -22,7 +19,6 @@
 - [System Workflow](#system-workflow)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Example Use Case](#example-use-case)
 - [Future Enhancements](#future-enhancements)
 - [License](#license)
 - [Contributing](#contributing)
@@ -67,7 +63,7 @@ Onchoscan/
 │   └── Report Viewer
 │
 ├── Backend (API Server)
-│   ├── Flask Application
+│   ├── FastAPI Application
 │   ├── Model Inference Engine
 │   ├── Report Generator
 │   ├── Recommendation Engine
@@ -84,44 +80,45 @@ Onchoscan/
 | Component | Purpose | Technology |
 |-----------|---------|-----------|
 | **Frontend** | User interface and interaction | HTML5, CSS3, JavaScript |
-| **Backend API** | Core business logic and inference | Flask, Python 3.8+ |
+| **Backend API** | Core business logic and inference | FastAPI, Python 3.8+ |
 | **ML Models** | Cancer detection predictions | PyTorch, Deep Learning |
-| **Report Generator** | Automated medical report creation | Jinja2, HTML Templates |
-| **Database** | Patient and prediction data storage | SQLite/PostgreSQL |
+| **Report Generator** | Automated medical report creation | ReportLab |
+| **Database** | Patient and prediction data storage | SQLite |
+| **LLM Integration** | AI recommendations | Groq API (Llama 3) |
 
 ---
 
 ## Tools and Technologies
 
 ### Backend
-- **Framework**: Flask 2.0+
+- **Framework**: FastAPI 0.100+
 - **Language**: Python 3.8+
 - **Server**: Uvicorn (ASGI)
 - **ML Framework**: PyTorch
 - **Data Processing**: NumPy, Pandas
-- **API Documentation**: OpenAPI/Swagger (optional)
+- **API Documentation**: OpenAPI/Swagger (built-in)
+- **Authentication**: OAuth2 with JWT tokens
+- **Database**: SQLite
+- **LLM Integration**: Groq API (Llama 3)
 
 ### Frontend
 - **HTML5**: Semantic markup and structure
 - **CSS3**: Responsive styling and animations
 - **JavaScript (ES6+)**: Dynamic interactions and AJAX
-- **Bootstrap/Tailwind**: (If used) CSS framework
+- **Custom CSS**: No external CSS frameworks
 
 ### ML/Data Science
 - **Model Framework**: PyTorch
+- **Model Architecture**: ResNet18 (transfer learning from ImageNet)
 - **Model Format**: .pth (PyTorch serialized models)
 - **Image Processing**: Pillow, OpenCV
 - **Numerical Computing**: NumPy, SciPy
+- **Explainability**: Grad-CAM for heatmap visualization
 
 ### Deployment
 - **Runtime**: Python 3.8+
 - **Package Manager**: pip
 - **Version Control**: Git
-
-### Development
-- **IDE**: VS Code / PyCharm
-- **Debugging**: Python debugger, Flask development server
-- **Testing**: pytest (recommended)
 
 ---
 
@@ -191,7 +188,6 @@ Report Integration
 ```
 
 ### 6. Batch Processing
-```
 Multiple Patient Records
     ↓
 Batch Report Generator (batch_report_generator.py)
@@ -229,7 +225,6 @@ Real-time Updates
 ### Backend Setup
 
 1. **Clone the repository**
-```bash
 git clone https://github.com/yourusername/onchoscan.git
 cd onchoscan
 ```
@@ -264,7 +259,6 @@ Ensure the following model files are in the `models/` directory:
 
 1. **Navigate to frontend directory**
 ```bash
-cd ../frontend
 ```
 
 2. **No installation required** - Frontend runs on HTML/CSS/JavaScript
@@ -280,12 +274,16 @@ python -m http.server 8000
 
 ### Running the Application
 
-1. **Start Backend Server**
+1. **Start Backend Server (FastAPI)**
 ```bash
 cd backend
 python -m uvicorn app:app --reload
 ```
 Server will run on: `http://localhost:8000`
+
+Automatic API documentation:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
 2. **Start Frontend**
 ```bash
@@ -299,7 +297,6 @@ python -m http.server 8001
 # Access at http://localhost:8001
 ```
 
-3. **Access Application**
 - Open `http://localhost:8001` (or your frontend port)
 - Login with credentials
 - Navigate to Dashboard
@@ -308,76 +305,47 @@ python -m http.server 8001
 
 ## Usage
 
-### Patient Management
-1. Navigate to **Patients** section
-2. Click **Add New Patient**
-3. Fill in patient information
-4. Upload medical imaging data
-5. Submit for analysis
+### Main Navigation
+- **Home**: Landing page and quick overview
+- **Predict**: Upload medical image and run cancer detection analysis
+- **Batch**: Process multiple images at once (CSV upload)
+- **History**: View all past predictions and analyses
+- **Compare**: Compare multiple predictions side-by-side
+- **Analytics**: View system statistics and trends
+- **About**: Project information
 
-### Running Predictions
-1. Go to **Analysis** tab
-2. Select patient
-3. Choose cancer type (Brain/Skin)
-4. System automatically processes image
-5. View prediction results
-
-### Generating Reports
-1. Complete patient analysis
-2. Click **Generate Report**
-3. Review report preview
-4. Download as PDF (if enabled)
-5. Save to patient record
+### Running a Prediction
+1. Navigate to **Predict** page
+2. Upload medical image (Brain MRI or Skin image)
+3. Select cancer type (Brain or Skin)
+4. Click analyze/predict
+5. View results with:
+    - Prediction (Positive/Negative)
+    - Confidence score (%)
+    - Grad-CAM heatmap visualization
+    - Risk level assessment
+6. Download PDF report if needed
 
 ### Batch Processing
-1. Navigate to **Batch Operations**
-2. Upload CSV file with patient data
-3. System processes all records
-4. Download bulk report
-5. Save results to database
+1. Navigate to **Batch** page
+2. Upload CSV file with image paths and patient info
+3. System processes all images simultaneously
+4. Download all reports as ZIP file
+5. Results are stored in database for future reference
 
-### Viewing Analytics
-1. Go to **Analytics** dashboard
-2. View prediction statistics
-3. Compare patient trends
-4. Export analytics data
+### Compare Predictions
+1. Go to **Compare** page
+2. Select two or more previous predictions
+3. View side-by-side analysis
+4. Compare confidence scores and visualizations
 
----
-
-## Example Use Case
-
-### Scenario: Early Brain Cancer Detection
-
-**Patient Details:**
-- Name: John Doe
-- Age: 45
-- Medical ID: P001
-- Symptoms: Headaches, vision issues
-
-**Workflow:**
-
-1. **Intake**: Patient data entered into system
-2. **Imaging**: MRI scan uploaded
-3. **Preprocessing**: Image normalized and prepared
-4. **Analysis**: Brain cancer model processes image
-5. **Results**:
-   - Prediction: Tumor Detected (85% confidence)
-   - Tumor Type: Glioblastoma
-   - Risk Level: High
-6. **Recommendations**:
-   - Urgent specialist referral
-   - Additional imaging recommended
-   - Treatment options provided
-7. **Report**: Comprehensive medical report generated and shared with physician
-
-**Output**: Automated report with:
-- Prediction results
-- Confidence metrics
-- Risk assessment
-- Clinical recommendations
-- Follow-up suggestions
+### View History & Analytics
+1. **History** page: Browse all past predictions with filters
+2. **Analytics** page: View statistics, model performance, and trends
 
 ---
+
+
 
 ## Future Enhancements
 
@@ -387,7 +355,6 @@ python -m http.server 8001
 - [ ] Multi-model ensemble predictions
 - [ ] Confidence interval calculations
 
-### Technical Improvements
 - [ ] Advanced caching mechanisms
 - [ ] Real-time WebSocket updates
 - [ ] Containerization (Docker/Kubernetes)
@@ -402,7 +369,9 @@ python -m http.server 8001
 - [ ] Explainable AI (XAI) integration
 - [ ] Model versioning and tracking
 
-### Security & Compliance
+- [ ] Note: Grad-CAM explainability is already integrated (visual heatmaps). Consider expanding XAI with LIME/SHAP and explanation dashboards.
+- [ ] ResNet18 used as base architecture; models are fine-tuned via transfer learning from ImageNet. Continue work on model tuning and monitoring.
+
 - [ ] HIPAA compliance implementation
 - [ ] End-to-end encryption
 - [ ] Advanced audit logging
@@ -411,7 +380,6 @@ python -m http.server 8001
 
 ### User Experience
 - [ ] Mobile application (iOS/Android)
-- [ ] Multi-language support
 - [ ] Advanced visualization dashboards
 - [ ] Real-time notifications
 - [ ] Telemedicine integration
@@ -421,7 +389,6 @@ python -m http.server 8001
 ## Installation Troubleshooting
 
 ### Common Issues
-
 **Issue: Model files not found**
 ```
 Solution: Ensure models/ directory contains:
@@ -444,9 +411,16 @@ pip install -r requirements.txt --no-cache-dir
 
 **Issue: CORS errors**
 ```
-Solution: Update Flask app to include CORS:
-from flask_cors import CORS
-CORS(app)
+Solution: CORS middleware is already configured in your FastAPI app:
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 ```
 
 ---
@@ -463,6 +437,7 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 - ⚠️ Liability limited
 - ⚠️ Warranty not provided
 
+**Notice**: Include the following in your project:
 ```
 MIT License
 
@@ -502,8 +477,8 @@ Contributions are welcome! Please follow these steps:
 
 ## Contact
 
-**Project Maintainer**: [P Ashwin Kumar]  
-**Email**: [ashwinkumarp2004@gmail.com]  
+**Project Maintainer**: P Ashwin Kumar  
+**Email**: ashwinkumarp2004@gmail.com  
 **GitHub**: [@ashwin007-ai](https://github.com/ashwin007-ai)  
 **LinkedIn**: [https://www.linkedin.com/in/ashwinkumarpaswan/]
 
@@ -519,17 +494,18 @@ For issues and questions:
 
 - Thanks to the open-source community
 - PyTorch team for the ML framework
-- Flask community for the web framework
+ - FastAPI community for the web framework
 - All contributors and testers
 
 ---
 
 ## References
 
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
 - [PyTorch Documentation](https://pytorch.org/docs/)
-- [Flask Documentation](https://flask.palletsprojects.com/)
 - [Medical Image Analysis](https://en.wikipedia.org/wiki/Medical_image_computing)
 - [Deep Learning in Healthcare](https://www.ibm.com/cloud/blog/deep-learning-healthcare)
+- [Groq API Documentation](https://console.groq.com/docs)
 
 ---
 
