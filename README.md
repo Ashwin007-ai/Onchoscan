@@ -463,7 +463,6 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 - ⚠️ Liability limited
 - ⚠️ Warranty not provided
 
-**Notice**: Include the following in your project:
 ```
 MIT License
 
@@ -503,10 +502,10 @@ Contributions are welcome! Please follow these steps:
 
 ## Contact
 
-**Project Maintainer**: [Your Name]  
-**Email**: [your.email@example.com]  
-**GitHub**: [@yourprofile](https://github.com/yourprofile)  
-**LinkedIn**: [Your LinkedIn Profile]
+**Project Maintainer**: [P Ashwin Kumar]  
+**Email**: [ashwinkumarp2004@gmail.com]  
+**GitHub**: [@ashwin007-ai](https://github.com/ashwin007-ai)  
+**LinkedIn**: [https://www.linkedin.com/in/ashwinkumarpaswan/]
 
 ### Support
 For issues and questions:
