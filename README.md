@@ -1,74 +1,100 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-green)](https://fastapi.tiangolo.com/)
+# OnchoScan
 
-# Onchoscan
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Python](https://img.shields.io/badge/Python-3.11-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-green.svg)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.2.2-red.svg)
 
-**Onchoscan** is an intelligent multi-cancer detection and analysis platform that leverages deep learning models to assist healthcare professionals in early cancer diagnosis. The system provides real-time predictions, comprehensive patient analytics, and detailed medical reports for brain and skin cancers.
+## Intelligent Multi-Cancer Detection and Analysis Platform
 
-**Project Type:** Medical AI/ML Application
-**Current Version:** 1.0.0
-**Last Updated:** May 2026
+**OnchoScan** is an AI-powered cancer detection and analysis platform designed to assist healthcare professionals with early diagnosis of Brain and Skin cancers. The system integrates Deep Learning, Explainable AI (Grad-CAM), PDF report generation, patient management, analytics, and AI-generated clinical recommendations.
 
----
-
-## Table of Contents
-
-- [Features](#features)
-- [Project Architecture](#project-architecture)
-- [Tools and Technologies](#tools-and-technologies)
-- [System Workflow](#system-workflow)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Future Enhancements](#future-enhancements)
-- [License](#license)
-- [Contributing](#contributing)
-- [Contact](#contact)
+The platform combines FastAPI, PyTorch, Groq LLM integration, and modern frontend technologies to provide an end-to-end diagnostic workflow.
 
 ---
 
-## Features
+# Features
 
-### Core Features
-- **Multi-Cancer Detection** — Support for Brain and Skin cancer types
-- **AI-Powered Analysis** — Deep learning models with Grad-CAM heatmap explainability
-- **Patient Dashboard** — Comprehensive patient information management
-- **Real-time Analytics** — Interactive analytics and visualization
-- **Batch Processing** — Process multiple patient records via CSV upload
-- **Report Generation** — Automated PDF medical report creation
-- **Patient History** — Track and compare historical patient data
-- **Recommendation Engine** — AI-driven clinical recommendations via Groq (Llama 3)
-- **Authentication System** — Secure login with JWT-based session management
+## Core Features
 
-### Advanced Features
-- Comparative analysis between patient records
-- Grad-CAM heatmap visualization for model explainability
-- Patient profile management
-- Export functionality for reports
+### Multi-Cancer Detection
+
+* Brain Tumor Classification
+* Skin Cancer Classification
+* Deep Learning-based prediction pipeline
+* Confidence score generation
+
+### Explainable AI
+
+* Grad-CAM heatmap generation
+* Visual explanation of model predictions
+* Region-of-interest highlighting
+* Improved prediction transparency
+
+### Patient Management
+
+* Patient registration
+* Patient history tracking
+* Profile management
+* Prediction record storage
+
+### Analytics Dashboard
+
+* Prediction analytics
+* Patient statistics
+* Historical trends
+* Interactive visualizations
+
+### Report Generation
+
+* Automated PDF reports
+* Risk assessment summary
+* Confidence analysis
+* Downloadable reports
+
+### Batch Processing
+
+* CSV-based bulk processing
+* Multiple patient predictions
+* Bulk report generation
+* ZIP report downloads
+
+### AI Recommendation Engine
+
+* Groq LLM integration
+* Clinical recommendation generation
+* Prediction interpretation
+* Diagnostic assistance
+
+### Authentication
+
+* JWT-based authentication
+* Secure login system
+* Password hashing with bcrypt
+* Protected routes
 
 ---
 
-## Project Architecture
+# Project Architecture
 
-```
-onchoscan/
+```text
+OnchoScan/
+│
 ├── backend/
-│   ├── app.py                      # FastAPI application entry point
-│   ├── model_loader.py             # Loads brain and skin models
-│   ├── predict.py                  # Inference engine
-│   ├── report_generator.py         # Single patient PDF report
-│   ├── batch_report_generator.py   # Bulk report generation
-│   ├── recommendation_engine.py    # Groq LLM recommendations
-│   ├── landing.html                # Landing page served by FastAPI
-│   ├── onchoscan.db                # SQLite database
+│   ├── app.py
+│   ├── predict.py
+│   ├── model_loader.py
+│   ├── recommendation_engine.py
+│   ├── report_generator.py
+│   ├── batch_report_generator.py
+│   ├── landing.html
 │   ├── requirements.txt
 │   ├── runtime.txt
-│   ├── outputs/                    # Prediction output files
-│   ├── reports/                    # Generated PDF reports
+│   ├── .env.example
 │   └── .gitignore
 │
 ├── frontend/
-│   ├── index.html                  # Entry point
+│   ├── index.html
 │   ├── home.html
 │   ├── dashboard.html
 │   ├── analytics.html
@@ -85,8 +111,7 @@ onchoscan/
 │   ├── script.js
 │   ├── features.js
 │   ├── patient_notes.js
-│   ├── profile.js
-│   └── patients/
+│   └── profile.js
 │
 ├── models/
 │   ├── brain_model.pth
@@ -96,292 +121,498 @@ onchoscan/
 └── README.md
 ```
 
-### Component Description
+---
 
-| Component | Purpose | Technology |
-|-----------|---------|------------|
-| **Frontend** | User interface and interaction | HTML5, CSS3, JavaScript (ES6+) |
-| **Backend API** | Core business logic and inference | FastAPI 0.110.0, Python |
-| **ML Models** | Cancer detection predictions | PyTorch, ResNet18 |
-| **Report Generator** | Automated PDF report creation | ReportLab |
-| **Database** | Patient and prediction data storage | SQLite |
-| **LLM Integration** | AI-driven recommendations | Groq API (Llama 3) |
-| **Explainability** | Visual heatmap generation | Grad-CAM |
+# Technology Stack
+
+## Backend
+
+| Technology    | Purpose               |
+| ------------- | --------------------- |
+| FastAPI       | Backend Framework     |
+| Uvicorn       | ASGI Server           |
+| Python-Jose   | JWT Authentication    |
+| Passlib       | Password Hashing      |
+| Bcrypt        | Security              |
+| Python-Dotenv | Environment Variables |
+| Groq API      | LLM Integration       |
+| SQLite        | Database              |
 
 ---
 
-## Tools and Technologies
+## Machine Learning
 
-### Backend
-- **Framework**: FastAPI 0.110.0
-- **Language**: Python 3.8+
-- **Server**: Uvicorn 0.29.0 (ASGI)
-- **Authentication**: OAuth2 with JWT (python-jose 3.3.0)
-- **Password Hashing**: bcrypt 4.0.1
-- **File Uploads**: python-multipart 0.0.9
-- **Database**: SQLite
-- **LLM Integration**: Groq API (Llama 3)
-- **API Documentation**: OpenAPI/Swagger (built-in with FastAPI)
-
-### ML / Data Science
-- **ML Framework**: PyTorch 2.2.2
-- **Vision Library**: Torchvision 0.17.2
-- **Model Architecture**: ResNet18 (transfer learning from ImageNet)
-- **Model Format**: `.pth` (PyTorch serialized)
-- **Image Processing**: Pillow 10.3.0, OpenCV 4.9.0 (headless)
-- **Numerical Computing**: NumPy 1.26.4
-- **Explainability**: Grad-CAM 1.5.2
-
-### Frontend
-- **HTML5**: Semantic markup and structure
-- **CSS3**: Responsive styling and animations
-- **JavaScript (ES6+)**: Dynamic interactions and AJAX calls to backend API
-
-### Report Generation
-- **ReportLab 4.1.0**: PDF generation for medical reports
+| Technology  | Purpose               |
+| ----------- | --------------------- |
+| PyTorch     | Deep Learning         |
+| Torchvision | Pretrained Models     |
+| ResNet18    | Cancer Classification |
+| Grad-CAM    | Explainable AI        |
+| NumPy       | Numerical Computing   |
+| OpenCV      | Image Processing      |
+| Pillow      | Image Handling        |
 
 ---
 
-## System Workflow
+## Frontend
 
-### 1. User Authentication
-```
-User Access → Login (auth.js) → JWT Token Issued → Dashboard Access
-```
+| Technology      | Purpose      |
+| --------------- | ------------ |
+| HTML5           | Structure    |
+| CSS3            | Styling      |
+| JavaScript ES6+ | Client Logic |
 
-### 2. Cancer Detection
-```
-Image Upload → Preprocessing → model_loader.py → predict.py → Confidence Score + Grad-CAM
-```
+---
 
-### 3. Report Generation
-```
-Prediction Results → report_generator.py → PDF Report → Download
-```
+## Report Generation
 
-### 4. Recommendation Engine
-```
-Patient Data + Prediction → recommendation_engine.py → Groq API (Llama 3) → Clinical Recommendations
-```
+| Technology | Purpose        |
+| ---------- | -------------- |
+| ReportLab  | PDF Generation |
 
-### 5. Batch Processing
-```
-CSV Upload → batch_report_generator.py → Parallel Inference → Bulk PDF Reports → ZIP Download
-```
+---
 
-### 6. Analytics Dashboard
-```
-SQLite Database → Data Aggregation → analytics.html → Real-time Visualization
+# System Workflow
+
+## Authentication Flow
+
+```text
+User Login
+     │
+     ▼
+Authentication
+     │
+     ▼
+JWT Token Generated
+     │
+     ▼
+Dashboard Access
 ```
 
 ---
 
-## Installation
+## Prediction Workflow
 
-### Prerequisites
-- Python 3.8 or higher
-- pip
-- Git
-- Modern web browser (Chrome, Firefox, Safari, Edge)
+```text
+Image Upload
+     │
+     ▼
+Preprocessing
+     │
+     ▼
+Model Inference
+     │
+     ▼
+Prediction Result
+     │
+     ▼
+Grad-CAM Generation
+     │
+     ▼
+Risk Assessment
+```
 
-### 1. Clone the Repository
+---
+
+## Recommendation Workflow
+
+```text
+Prediction Result
+      │
+      ▼
+Patient Information
+      │
+      ▼
+Groq LLM
+      │
+      ▼
+Clinical Recommendation
+```
+
+---
+
+## Report Workflow
+
+```text
+Prediction
+     │
+     ▼
+Report Generator
+     │
+     ▼
+PDF Creation
+     │
+     ▼
+Download
+```
+
+---
+
+# Installation
+
+## Prerequisites
+
+* Python 3.11 Recommended
+* Python 3.10–3.12 Supported
+* Git
+* pip
+* Modern Browser
+
+---
+
+## Clone Repository
 
 ```bash
-git clone https://github.com/ashwin007-ai/onchoscan.git
-cd onchoscan
+git clone https://github.com/Ashwin007-ai/Onchoscan.git
+cd Onchoscan
 ```
 
-### 2. Backend Setup
+---
+
+## Backend Setup
+
+### Navigate to Backend
 
 ```bash
 cd backend
+```
 
-# Create virtual environment
-python -m venv venv
+### Create Virtual Environment
 
-# Activate — Windows
+```bash
+py -3.11 -m venv venv
+```
+
+### Activate Environment
+
+#### Windows CMD
+
+```cmd
 venv\Scripts\activate
+```
 
-# Activate — macOS/Linux
+#### Windows PowerShell
+
+```powershell
+venv\Scripts\Activate.ps1
+```
+
+#### Linux / macOS
+
+```bash
 source venv/bin/activate
+```
 
-# Install dependencies
+---
+
+## Install Dependencies
+
+```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 3. Verify Model Files
+---
 
-Ensure the following files exist in the `models/` directory at the project root:
+# Environment Variables
 
+Create a file named:
+
+```text
+.env
 ```
+
+inside the backend directory.
+
+Example:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+A template file is already provided:
+
+```text
+.env.example
+```
+
+Copy the template and replace the placeholder value with your actual API key.
+
+---
+
+# Model Files
+
+Verify that the following model files exist:
+
+```text
 models/
 ├── brain_model.pth
 └── skin_model.pth
 ```
 
-> If you trained the models yourself using the training scripts, copy the `.pth` files from your output directory into `models/`.
+---
 
-### 4. Start the Backend Server
+# Running the Application
+
+Start the backend server:
 
 ```bash
 cd backend
 uvicorn app:app --reload
 ```
 
-Backend runs at: `http://localhost:8000`
+Server URL:
 
-API documentation available at:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
+```text
+http://localhost:8000
+```
 
-### 5. Start the Frontend
+---
+
+# API Documentation
+
+Swagger UI:
+
+```text
+http://localhost:8000/docs
+```
+
+ReDoc:
+
+```text
+http://localhost:8000/redoc
+```
+
+---
+
+# Main Pages
+
+| Page      | Description           |
+| --------- | --------------------- |
+| Home      | Application Overview  |
+| Dashboard | Prediction Interface  |
+| Analytics | Prediction Analytics  |
+| Batch     | Bulk Processing       |
+| Compare   | Prediction Comparison |
+| History   | Historical Records    |
+| Profile   | User Profile          |
+| About     | Project Information   |
+
+---
+
+# Running a Prediction
+
+1. Open Dashboard.
+2. Upload Brain MRI or Skin Lesion image.
+3. Select Cancer Type.
+4. Click Analyze.
+5. Review:
+
+   * Prediction
+   * Confidence Score
+   * Risk Assessment
+   * Grad-CAM Heatmap
+6. Download PDF Report.
+
+---
+
+# Batch Processing
+
+1. Open Batch Processing page.
+2. Upload CSV file.
+3. Start processing.
+4. Wait for report generation.
+5. Download ZIP package.
+
+---
+
+# Requirements
+
+```txt
+fastapi==0.110.0
+uvicorn==0.29.0
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.9
+python-dotenv==1.2.2
+passlib[bcrypt]==1.7.4
+groq
+pillow==10.3.0
+torch==2.2.2
+torchvision==0.17.2
+numpy==1.26.4
+opencv-python-headless==4.9.0.80
+grad-cam==1.5.2
+reportlab==4.1.0
+bcrypt==4.0.1
+```
+
+---
+
+# Troubleshooting
+
+## Missing Model Files
+
+```text
+FileNotFoundError
+```
+
+Ensure:
+
+```text
+models/brain_model.pth
+models/skin_model.pth
+```
+
+exist.
+
+---
+
+## Missing Groq API Key
+
+Error:
+
+```text
+groq.GroqError
+```
+
+Solution:
+
+Create:
+
+```text
+backend/.env
+```
+
+and add:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+---
+
+## Dependency Installation Issues
+
+Use Python 3.11:
 
 ```bash
-cd frontend
-
-# Option 1: Open index.html directly in your browser
-
-# Option 2: Serve with Python
-python -m http.server 8001
-# Then open http://localhost:8001
+py -3.11 -m venv venv
 ```
 
 ---
 
-## Usage
+## PowerShell Activation Error
 
-### Main Pages
+Error:
 
-| Page | URL | Purpose |
-|------|-----|---------|
-| Home | `/home.html` | Landing overview |
-| Predict | `/dashboard.html` | Upload image and run prediction |
-| Batch | `/batch.html` | Process multiple images via CSV |
-| History | `/history.html` | View all past predictions |
-| Compare | `/compare.html` | Side-by-side prediction comparison |
-| Analytics | `/analytics.html` | Stats and trends |
-| Profile | `/profile.html` | User profile management |
-| About | `/about.html` | Project information |
+```text
+running scripts is disabled on this system
+```
 
-### Running a Prediction
+Run:
 
-1. Go to the **Dashboard** page
-2. Upload a medical image (Brain MRI or Skin lesion image)
-3. Select the cancer type (Brain or Skin)
-4. Click **Analyze**
-5. View results:
-   - Prediction label and confidence score (%)
-   - Grad-CAM heatmap showing regions of interest
-   - Risk level assessment
-6. Download the PDF report if needed
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
 
-### Batch Processing
+Or use Command Prompt:
 
-1. Go to the **Batch** page
-2. Upload a CSV file containing image paths and patient info
-3. The system processes all images and generates reports
-4. Download all reports as a ZIP file
-
-### Compare Predictions
-
-1. Go to the **Compare** page
-2. Select two or more past predictions
-3. View side-by-side confidence scores and visualizations
+```cmd
+venv\Scripts\activate.bat
+```
 
 ---
 
-## Troubleshooting
+# Future Enhancements
 
-**Model files not found**
-```
-Ensure models/brain_model.pth and models/skin_model.pth exist.
-```
+## Cancer Detection
 
-**Port already in use**
+* Lung Cancer Detection
+* Breast Cancer Detection
+* Colorectal Cancer Detection
+* Multi-Cancer Ensemble Models
+
+## Explainable AI
+
+* SHAP Integration
+* LIME Integration
+* Interactive Heatmaps
+
+## Infrastructure
+
+* Docker Support
+* GitHub Actions CI/CD
+* Cloud Deployment
+* Automated Testing
+
+## Security
+
+* Two-Factor Authentication
+* Role-Based Access Control
+* Enhanced Encryption
+
+## User Experience
+
+* Mobile Application
+* Notifications
+* Telemedicine Integration
+
+---
+
+# Contributing
+
+1. Fork Repository
+2. Create Feature Branch
+
 ```bash
-uvicorn app:app --reload --port 8001
+git checkout -b feature/new-feature
 ```
 
-**Dependency installation fails**
+3. Commit Changes
+
 ```bash
-pip install --upgrade pip
-pip install -r requirements.txt --no-cache-dir
+git commit -m "Add new feature"
 ```
 
-**CORS errors in browser**
+4. Push Changes
+
+```bash
+git push origin feature/new-feature
 ```
-CORS is already configured in app.py via FastAPI's CORSMiddleware.
-If issues persist, ensure the backend is running before opening the frontend.
-```
+
+5. Open Pull Request
 
 ---
 
-## Future Enhancements
+# License
 
-### Cancer Detection
-- [ ] Support for additional cancer types (Lung, Breast, Colorectal)
-- [ ] Multi-model ensemble predictions
-- [ ] 3D medical image analysis
-
-### Infrastructure
-- [ ] Containerization with Docker
-- [ ] Cloud deployment (AWS / Azure / GCP)
-- [ ] CI/CD pipeline with GitHub Actions
-- [ ] Automated test suite with pytest
-- [ ] Real-time WebSocket updates
-
-### AI/ML
-- [ ] LIME/SHAP integration alongside existing Grad-CAM
-- [ ] Model versioning and tracking (MLflow)
-- [ ] Federated learning support
-
-### Security & Compliance
-- [ ] HIPAA compliance implementation
-- [ ] End-to-end encryption
-- [ ] Two-factor authentication
-- [ ] Data anonymization tools
-
-### User Experience
-- [ ] Mobile application (iOS/Android)
-- [ ] Real-time notifications
-- [ ] Telemedicine integration
+This project is licensed under the MIT License.
 
 ---
 
-## License
+# Contact
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+**Maintainer:** P Ashwin Kumar
 
----
+**GitHub:** https://github.com/Ashwin007-ai
 
-## Contributing
+**LinkedIn:** https://www.linkedin.com/in/ashwinkumarpaswan/
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m 'Add your feature'`
-4. Push to branch: `git push origin feature/your-feature`
-5. Open a Pull Request
-
-Please follow PEP 8 for Python code and include docstrings for all functions.
+**Project:** OnchoScan
 
 ---
 
-## Contact
+# References
 
-**Project Maintainer**: P Ashwin Kumar
-**Email**: ashwinkumarp2004@gmail.com
-**GitHub**: [@ashwin007-ai](https://github.com/ashwin007-ai)
-**LinkedIn**: [ashwinkumarpaswan](https://www.linkedin.com/in/ashwinkumarpaswan/)
-
----
-
-## References
-
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [PyTorch Documentation](https://pytorch.org/docs/)
-- [Grad-CAM Paper](https://arxiv.org/abs/1610.02391)
-- [Groq API Documentation](https://console.groq.com/docs)
+* FastAPI Documentation
+* PyTorch Documentation
+* Grad-CAM Research Paper
+* Groq API Documentation
 
 ---
 
-*Last Updated: May 2026 | Version: 1.0.0 | Status: Active Development*
+**Version:** 1.0.0
+
+**Status:** Active Development
+
+**Last Updated:** June 2026
