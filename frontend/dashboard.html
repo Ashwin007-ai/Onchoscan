@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+/* Prevent theme flash on load */
+(function(){
+  if(localStorage.getItem("oncho_theme")==="light")
+    document.documentElement.classList.add("preload-light");
+})();
+</script>
+<style>
+html.preload-light body { background:#f2f8f5 !important; }
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnchoScan – Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="patient_notes.css">
+<style>
+.dropzone { position: relative; }
+.dropzone input[type="file"] {
+  position: absolute; inset: 0; opacity: 0;
+  cursor: pointer; width: 100%; height: 100%; z-index: 2;
+}
+.dropzone #dzContent, .dropzone .dz-preview {
+  position: relative; z-index: 1; pointer-events: none;
+}
+
+    /* ── Predict page empty state ──────────────────────── */
+    .predict-empty {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      background: var(--bg2); border: 1.5px dashed var(--border);
+      border-radius: 16px; padding: 48px 28px; gap: 16px; min-height: 340px;
+    }
+    .predict-empty.hidden { display: none; }
+    .pe-icon { font-size: 3rem; line-height: 1; }
+    .pe-title { font-size: 0.95rem; color: var(--text3); line-height: 1.7; margin: 0; }
+    .pe-title strong { color: var(--accent); }
+    .pe-list { list-style: none; padding: 0; margin: 8px 0 0; display: flex;
+               flex-direction: column; gap: 9px; width: 100%; max-width: 230px; }
+    .pe-list li { font-size: 0.82rem; color: var(--text2); background: var(--bg3);
+                  border-radius: 8px; padding: 8px 14px; text-align: left; }
+
+    /* ── AI Recommendation panel ── */
+    .recommendation-panel {
+      background: var(--bg2);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+    .recommendation-panel .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .rec-badge {
+      font-size: 0.7rem; color: var(--accent2); font-weight: 600;
+      background: rgba(0,212,255,0.08); padding: 3px 9px;
+      border-radius: 6px; border: 1px solid rgba(0,212,255,0.2);
+      white-space: nowrap;
+    }
+    .recommendation-text {
+      font-size: 0.92rem; color: var(--text2); line-height: 1.75;
+      margin: 0; white-space: pre-wrap;
+      background: var(--bg3); border-radius: 10px;
+      padding: 14px 16px;
+      border-left: 3px solid var(--accent2);
+    }
+    .rec-footer {
+      margin-top: 8px; font-size: 0.7rem; color: var(--text3);
+      font-style: italic;
+    }
+</style>
+</head>
+<body class="app-page">
+
+<nav class="navbar">
+  <a href="/app/dashboard.html" class="nav-brand">
+    <div class="logo-icon sm"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#4fffb0" stroke-width="2"/><path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="#4fffb0" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="20" cy="20" r="3" fill="#4fffb0"/></svg></div>
+    <span>OnchoScan</span>
+  </a>
+  <div class="nav-links">
+    <a href="/app/home.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>Home</a>
+    <a href="/app/dashboard.html" class="nav-link active"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>Predict</a>
+    <a href="/app/batch.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/></svg>Batch</a>
+    <a href="/app/history.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>History</a>
+    <a href="/app/compare.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"/></svg>Compare</a>
+    <a href="/app/analytics.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>Analytics</a>
+    <a href="/app/about.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>About</a>
+  </div>
+  <div class="nav-user">
+        <button class="theme-toggle" id="themeToggle" type="button" title="Switch to light mode">☀️</button>
+    <button class="notif-bell" id="notifBell" type="button" title="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="notif-badge" id="notifBadge"></span>
+    </button>
+    <span class="user-avatar" id="navAvatar">?</span>
+    <span id="navUsername" class="nav-uname"></span>
+    <button type="button" class="btn-logout" id="logoutBtn">Sign out</button>
+  </div>
+</nav>
+
+<main class="main-container">
+  <section class="page-hero">
+    <h1>Cancer Detection <em>Dashboard</em></h1>
+    <p>Upload a medical image, select cancer type, and get an instant AI-powered analysis.</p>
+  </section>
+
+  <div class="predict-grid">
+    <div class="card upload-card">
+      <div class="card-header"><h3>Upload & Configure</h3></div>
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept="image/*">
+        <div id="dzContent">
+          <div class="dz-icon"><svg viewBox="0 0 48 48" fill="none"><path d="M24 4L24 32M24 4L16 12M24 4L32 12" stroke="#4fffb0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 36v4a2 2 0 002 2h28a2 2 0 002-2v-4" stroke="#4fffb0" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+          <p class="dz-label">Drop image here or <span>browse</span></p>
+          <p class="dz-hint">Supports JPEG, PNG, TIFF, WEBP</p>
+        </div>
+        <img id="preview" class="dz-preview hidden" alt="preview">
+      </div>
+
+      <div class="selector-row">
+        <div class="selector-option active" id="opt-brain">
+          <div class="sel-icon">🧠</div>
+          <div><strong>Brain Tumor</strong><small>Glioma · Meningioma · Pituitary</small></div>
+        </div>
+        <div class="selector-option" id="opt-skin">
+          <div class="sel-icon">🔬</div>
+          <div><strong>Skin Cancer</strong><small>Benign · Malignant</small></div>
+        </div>
+      </div>
+
+      <button type="button" id="predictBtn" class="btn-primary" style="margin-top:8px">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
+        <span>Run Analysis</span>
+      </button>
+      <div id="loadingBar" class="loading-bar hidden"><div class="lb-inner"></div></div>
+    </div>
+
+    <div id="predictEmptyState" class="predict-empty">
+      <div class="pe-icon">🔬</div>
+      <p class="pe-title">Upload an image and click<br><strong>Run Analysis</strong> to see results here.</p>
+      <ul class="pe-list">
+        <li>🧠 Brain Tumor Detection</li>
+        <li>🔬 Skin Cancer Screening</li>
+        <li>🌡️ Grad-CAM Heatmaps</li>
+        <li>📄 PDF Report Generation</li>
+      </ul>
+    </div>
+
+    <div id="resultsPanel" class="results-panel hidden">
+      <div class="card">
+        <div class="card-header"><h3>Prediction Result</h3><div id="riskBadge" class="risk-badge">–</div></div>
+        <div class="result-prediction" id="predictionDisplay"></div>
+        <div class="confidence-row"><span>Confidence</span><span id="confText" class="conf-val"></span></div>
+        <div class="conf-bar-wrap"><div class="conf-bar" id="confBar" style="width:0%"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Risk Assessment</h3></div>
+        <div class="risk-gauge-wrap" id="gaugeWrap"></div>
+        <p class="diagnostic-text" id="diagnosticText"></p>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Class Probabilities</h3></div>
+        <div id="probBars" class="prob-bars"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Grad-CAM Visualization</h3></div>
+        <p class="card-sub">Highlighted regions show what the model focused on.</p>
+        <div class="heatmap-compare">
+          <div class="heatmap-item"><span class="hm-label">Original</span><img id="originalImg" src="" alt="Original"></div>
+          <div class="heatmap-divider"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></div>
+          <div class="heatmap-item"><span class="hm-label">Grad-CAM</span><img id="heatmapImg" src="" alt="Grad-CAM"></div>
+        </div>
+      </div>
+      <!-- ── AI Clinical Recommendation (LLaMA 3 via Groq) ── -->
+      <div class="card recommendation-panel hidden" id="recommendationPanel">
+        <div class="card-header">
+          <h3>AI Clinical Recommendation</h3>
+          <span class="rec-badge">LLaMA 3 · Groq AI</span>
+        </div>
+        <p class="recommendation-text" id="recommendationText"></p>
+        <p class="rec-footer">Generated by LLaMA 3 (Groq AI) · Based on ResNet-18 prediction patterns · Not a substitute for professional medical advice.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>Download Report</h3></div>
+        <p style="font-size:.9rem;color:var(--text2)">Full diagnostic PDF with Grad-CAM and recommendations.</p>
+        <a id="reportLink" href="#" target="_blank" class="btn-download">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          Download PDF Report
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer"><div class="footer-inner">
+  <div class="footer-brand"><div class="logo-icon sm"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#4fffb0" stroke-width="2"/><path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="#4fffb0" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="20" cy="20" r="3" fill="#4fffb0"/></svg></div>OnchoScan</div>
+  <p class="footer-disclaimer">⚠ For research and educational use only. Not a substitute for professional medical diagnosis.</p>
+  <p class="footer-copy">© 2025 OnchoScan · Powered by ResNet18 + Grad-CAM</p>
+</div></footer>
+
+<script src="app.js"></script>
+<script src="patient_notes.js"></script>
+<script src="features.js"></script>
+
+<script>
+// Hide empty state when results panel becomes visible
+(function() {
+  var rp = document.getElementById("resultsPanel");
+  var es = document.getElementById("predictEmptyState");
+  if (!rp || !es) return;
+  var obs = new MutationObserver(function() {
+    es.classList.toggle("hidden", !rp.classList.contains("hidden"));
+  });
+  obs.observe(rp, { attributes: true, attributeFilter: ["class"] });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function(){
+  if(localStorage.getItem("oncho_theme")==="light")
+    document.documentElement.classList.add("preload-light");
+})();
+</script>
+<style>html.preload-light body { background:#f2f8f5 !important; }</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnchoScan – About & System Info</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── Section titles ──────────────────────────────────────────── */
+.ab-section { max-width: 900px; margin: 0 auto 40px; }
+.ab-section-title {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 20px;
+}
+.ab-section-title::after {
+  content: ''; flex: 1; height: 1px; background: var(--border2);
+}
+
+/* ── Hero banner ─────────────────────────────────────────────── */
+.ab-hero {
+  max-width: 900px; margin: 0 auto 48px;
+  background: linear-gradient(135deg, rgba(79,255,176,.06) 0%, rgba(0,212,255,.04) 100%);
+  border: 1px solid var(--border2); border-radius: 20px;
+  padding: 40px 40px 36px; position: relative; overflow: hidden;
+}
+.ab-hero::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,255,176,.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.ab-hero-label {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+.ab-hero-label span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: block; }
+.ab-hero h2 { font-size: 1.9rem; font-weight: 700; color: var(--text); margin: 0 0 14px; line-height: 1.25; }
+.ab-hero h2 em { font-style: italic; color: var(--accent); font-family: 'DM Serif Display', serif; }
+.ab-hero p { font-size: 0.95rem; color: var(--text2); line-height: 1.75; max-width: 620px; margin: 0 0 24px; }
+.ab-hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+.ab-stat { display: flex; flex-direction: column; gap: 2px; }
+.ab-stat-num { font-size: 1.5rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.ab-stat-label { font-size: 0.75rem; color: var(--text3); }
+
+/* ── Two-column grid ─────────────────────────────────────────── */
+.ab-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.ab-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* ── Generic info card ───────────────────────────────────────── */
+.ab-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 14px;
+  transition: border-color .2s;
+}
+.ab-card:hover { border-color: var(--border2); }
+.ab-card.full  { grid-column: 1 / -1; }
+.ab-card.accent-border { border-color: rgba(79,255,176,.3); }
+
+.ab-card-icon { font-size: 1.8rem; line-height: 1; }
+.ab-card h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0; }
+.ab-card h4 { font-size: 0.88rem; font-weight: 700; color: var(--text); margin: 0 0 6px; }
+.ab-card p, .ab-card li {
+  font-size: 0.88rem; color: var(--text2); line-height: 1.7; margin: 0;
+}
+.ab-card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; }
+
+/* ── Feature row (icon + text) ───────────────────────────────── */
+.ab-feat-list { display: flex; flex-direction: column; gap: 12px; }
+.ab-feat {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 12px; background: var(--bg3); border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.ab-feat-ico { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.ab-feat-text strong { display: block; font-size: 0.85rem; color: var(--text); margin-bottom: 2px; }
+.ab-feat-text span  { font-size: 0.8rem; color: var(--text2); line-height: 1.55; }
+
+/* ── Model chips ─────────────────────────────────────────────── */
+.ab-model-chip {
+  padding: 14px 16px; background: var(--bg3);
+  border-radius: 12px; border: 1px solid var(--border2);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.ab-model-chip .mc-name { font-size: 0.95rem; font-weight: 700; color: var(--accent); }
+.ab-model-chip .mc-arch { font-size: 0.8rem; color: var(--accent2); font-weight: 600; }
+.ab-model-chip .mc-classes { font-size: 0.78rem; color: var(--text2); }
+.ab-model-chip .mc-desc { font-size: 0.8rem; color: var(--text3); line-height: 1.55; margin-top: 4px; }
+.ab-model-chips { display: flex; flex-direction: column; gap: 10px; }
+
+/* ── Accuracy bar ────────────────────────────────────────────── */
+.acc-row { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.acc-label-row { display: flex; justify-content: space-between; font-size: 0.78rem; }
+.acc-label-row span:first-child { color: var(--text2); }
+.acc-label-row span:last-child  { color: var(--accent); font-weight: 700; }
+.acc-bar-bg { height: 6px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
+.acc-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 1s ease; width: 0; }
+
+/* ── Pipeline ────────────────────────────────────────────────── */
+.ab-pipeline {
+  display: flex; align-items: stretch; flex-wrap: wrap; gap: 0; margin: 4px 0 16px;
+}
+.pipe-node {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 18px; background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 10px; flex: 1; min-width: 80px; text-align: center;
+  position: relative;
+}
+.pipe-node .pn-ico  { font-size: 1.3rem; }
+.pipe-node .pn-name { font-size: 0.75rem; font-weight: 700; color: var(--accent); }
+.pipe-node .pn-desc { font-size: 0.67rem; color: var(--text3); line-height: 1.4; }
+.pipe-arrow-h {
+  display: flex; align-items: center; padding: 0 4px;
+  color: var(--accent2); font-size: 1rem; flex-shrink: 0;
+}
+
+/* ── Tech stack ──────────────────────────────────────────────── */
+.ab-tech-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.ab-tech {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 10px 14px; background: var(--bg3);
+  border: 1px solid var(--border2); border-radius: 10px; min-width: 90px;
+}
+.ab-tech .t-name { font-size: 0.82rem; font-weight: 700; color: var(--accent2); }
+.ab-tech .t-role { font-size: 0.72rem; color: var(--text3); }
+
+/* ── How it works steps ──────────────────────────────────────── */
+.ab-steps { display: flex; flex-direction: column; gap: 0; }
+.ab-step {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 16px 0; border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.ab-step:last-child { border-bottom: none; }
+.ab-step-num {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 800; color: #050d15;
+}
+.ab-step-body strong { display: block; font-size: 0.88rem; color: var(--text); margin-bottom: 3px; }
+.ab-step-body span { font-size: 0.82rem; color: var(--text2); line-height: 1.6; }
+
+/* ── Grad-CAM explanation ────────────────────────────────────── */
+.gradcam-visual {
+  display: flex; gap: 8px; margin: 8px 0; align-items: center; flex-wrap: wrap;
+}
+.gcv-box {
+  flex: 1; min-width: 80px; border-radius: 10px; padding: 12px 10px;
+  text-align: center; font-size: 0.72rem; font-weight: 600;
+  border: 1px solid var(--border);
+}
+.gcv-box.orig { background: var(--bg3); color: var(--text2); }
+.gcv-box.heat { background: linear-gradient(135deg,rgba(255,79,123,.15),rgba(255,184,79,.1)); color: var(--medium); border-color: rgba(255,184,79,.3); }
+.gcv-box.over { background: linear-gradient(135deg,rgba(79,255,176,.1),rgba(0,212,255,.08)); color: var(--accent); border-color: var(--border2); }
+.gcv-arrow { color: var(--text3); font-size: 1rem; flex-shrink: 0; }
+.gcv-label { font-size: 0.68rem; color: var(--text3); margin-top: 4px; }
+
+/* ── Dataset cards ───────────────────────────────────────────── */
+.ab-dataset {
+  padding: 14px 16px; background: var(--bg3); border-radius: 12px;
+  border: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start;
+}
+.ab-dataset + .ab-dataset { margin-top: 10px; }
+.ds-dot2 { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.ds-dot2.brain { background: var(--accent2); }
+.ds-dot2.skin  { background: var(--accent); }
+.ab-dataset strong { display: block; font-size: 0.88rem; color: var(--text); margin-bottom: 3px; }
+.ab-dataset p      { font-size: 0.8rem; color: var(--text2); line-height: 1.55; margin: 0; }
+.ab-dataset .ds-stats { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+.ab-dataset .ds-stat  { font-size: 0.72rem; color: var(--accent2); background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.2); border-radius: 6px; padding: 2px 8px; font-weight: 600; }
+
+/* ── Risk level table ────────────────────────────────────────── */
+.risk-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 8px; }
+.risk-table th { text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); padding: 6px 10px; border-bottom: 1px solid var(--border2); }
+.risk-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; line-height: 1.55; }
+.risk-table tr:last-child td { border-bottom: none; }
+.rtag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; }
+.rtag.high   { background: rgba(255,79,123,.12); color: var(--high);   border: 1px solid rgba(255,79,123,.3); }
+.rtag.medium { background: rgba(255,184,79,.1);  color: var(--medium); border: 1px solid rgba(255,184,79,.3); }
+.rtag.low    { background: rgba(79,255,176,.1);  color: var(--low);    border: 1px solid rgba(79,255,176,.3); }
+
+/* ── Disclaimer ──────────────────────────────────────────────── */
+.ab-disclaimer {
+  max-width: 900px; margin: 0 auto 40px;
+  background: rgba(255,79,123,.04); border: 1px solid rgba(255,79,123,.25);
+  border-radius: 16px; padding: 24px 28px; display: flex; gap: 16px;
+}
+.ab-disclaimer-icon { font-size: 1.8rem; flex-shrink: 0; }
+.ab-disclaimer h3 { font-size: 0.95rem; font-weight: 700; color: var(--high); margin: 0 0 8px; }
+.ab-disclaimer p  { font-size: 0.85rem; color: var(--text2); line-height: 1.7; margin: 0; }
+.ab-disclaimer strong { color: var(--high); }
+
+/* ── FAQ accordion ───────────────────────────────────────────── */
+.ab-faq { display: flex; flex-direction: column; gap: 8px; }
+.faq-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.faq-q {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 16px; cursor: pointer; background: none; border: none;
+  color: var(--text); font-size: 0.88rem; font-weight: 600; text-align: left;
+  font-family: inherit; gap: 12px;
+}
+.faq-q:hover { color: var(--accent); }
+.faq-chevron { flex-shrink: 0; transition: transform .25s; color: var(--text3); }
+.faq-item.open .faq-chevron { transform: rotate(180deg); }
+.faq-a { display: none; padding: 0 16px 14px; font-size: 0.83rem; color: var(--text2); line-height: 1.7; }
+.faq-item.open .faq-a { display: block; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .ab-grid-2, .ab-grid-3 { grid-template-columns: 1fr; }
+  .ab-card.full { grid-column: 1; }
+  .ab-hero { padding: 28px 20px; }
+  .ab-hero h2 { font-size: 1.4rem; }
+  .ab-pipeline { gap: 4px; }
+  .pipe-arrow-h { display: none; }
+}
+</style>
+</head>
+<body class="app-page">
+
+<nav class="navbar">
+  <a href="/app/dashboard.html" class="nav-brand">
+    <div class="logo-icon sm"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#4fffb0" stroke-width="2"/><path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="#4fffb0" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="20" cy="20" r="3" fill="#4fffb0"/></svg></div>
+    <span>OnchoScan</span>
+  </a>
+  <div class="nav-links">
+    <a href="/app/home.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>Home</a>
+    <a href="/app/dashboard.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>Predict</a>
+    <a href="/app/batch.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/></svg>Batch</a>
+    <a href="/app/history.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>History</a>
+    <a href="/app/compare.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"/></svg>Compare</a>
+    <a href="/app/analytics.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>Analytics</a>
+    <a href="/app/about.html" class="nav-link active"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>About</a>
+  </div>
+  <div class="nav-user">
+    <button class="theme-toggle" id="themeToggle" type="button" title="Switch to light mode">☀️</button>
+    <button class="notif-bell" id="notifBell" type="button" title="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="notif-badge" id="notifBadge"></span>
+    </button>
+    <span class="user-avatar" id="navAvatar">?</span>
+    <span id="navUsername" class="nav-uname"></span>
+    <button type="button" class="btn-logout" id="logoutBtn">Sign out</button>
+  </div>
+</nav>
+
+<main class="main-container">
+
+  <section class="page-hero">
+    <h1>System <em>Information</em></h1>
+    <p>Everything you need to know about OnchoScan — how it works, what powers it, and how to use it effectively.</p>
+  </section>
+
+  <!-- ── HERO BANNER ──────────────────────────────────────────── -->
+  <div class="ab-hero">
+    <div class="ab-hero-label"><span></span> AI-Powered Medical Screening Platform</div>
+    <h2>What is <em>OnchoScan?</em></h2>
+    <p>OnchoScan is an AI-assisted cancer screening platform built for clinicians, researchers, and medical students. It uses deep learning Convolutional Neural Networks to analyse brain MRI scans and skin lesion images, then pairs those outputs with Llama 3 generated AI clinical recommendations, explainable Grad-CAM heatmaps, and downloadable clinical PDF reports — all within seconds of uploading an image.</p>
+    <div class="ab-hero-stats">
+      <div class="ab-stat"><span class="ab-stat-num">2</span><span class="ab-stat-label">Cancer Types</span></div>
+      <div class="ab-stat"><span class="ab-stat-num">6</span><span class="ab-stat-label">Detection Classes</span></div>
+      <div class="ab-stat"><span class="ab-stat-num">ResNet-18</span><span class="ab-stat-label">CNN Architecture</span></div>
+      <div class="ab-stat"><span class="ab-stat-num">Grad-CAM</span><span class="ab-stat-label">Explainability</span></div>
+      <div class="ab-stat"><span class="ab-stat-num">&lt; 60s</span><span class="ab-stat-label">Analysis Time</span></div>
+    </div>
+  </div>
+
+  <!-- ── KEY FEATURES ─────────────────────────────────────────── -->
+  <div class="ab-section">
+    <div class="ab-section-title">✦ Key Features</div>
+    <div class="ab-grid-2">
+      <div class="ab-card">
+        <div class="ab-card-icon">🧠</div>
+        <h3>Dual Cancer Detection</h3>
+        <div class="ab-feat-list">
+          <div class="ab-feat"><div class="ab-feat-ico">🧠</div><div class="ab-feat-text"><strong>Brain Tumor Analysis</strong><span>Classifies MRI scans into Glioma, Meningioma, Pituitary Tumor, or No Tumor with per-class probability scores.</span></div></div>
+          <div class="ab-feat"><div class="ab-feat-ico">🔬</div><div class="ab-feat-text"><strong>Skin Cancer Screening</strong><span>Analyses dermatoscopic images to classify lesions as Benign or Malignant using HAM10000-trained weights.</span></div></div>
+        </div>
+      </div>
+      <div class="ab-card">
+        <div class="ab-card-icon">📄</div>
+        <h3>Clinical PDF Reports</h3>
+        <p>Every analysis generates a downloadable, professionally formatted PDF report containing:</p>
+        <ul>
+          <li>Patient information and clinical notes</li>
+          <li>Prediction result with confidence percentage</li>
+          <li>Risk level assessment and risk score gauge</li>
+          <li>Grad-CAM original and heatmap images</li>
+          <li>Class probability breakdown</li>
+          <li>AI-generated clinical recommendations</li>
+          <li>Full diagnostic text for reference</li>
+        </ul>
+      </div>
+      <div class="ab-card">
+        <div class="ab-card-icon">📋</div>
+        <h3>Patient Notes Integration</h3>
+        <div class="ab-feat-list">
+          <div class="ab-feat"><div class="ab-feat-ico">👤</div><div class="ab-feat-text"><strong>Patient Context</strong><span>Attach name, age, sex, presenting symptoms, and free-text clinical notes to each scan before analysis.</span></div></div>
+          <div class="ab-feat"><div class="ab-feat-ico">📎</div><div class="ab-feat-text"><strong>Embedded in Reports</strong><span>Patient information is embedded directly into the PDF report for complete clinical documentation.</span></div></div>
+          <div class="ab-feat"><div class="ab-feat-ico">🧠</div><div class="ab-feat-text"><strong>Llama 3 Recommendations</strong><span>After prediction, Llama 3 generates concise AI clinical recommendation points tailored to the detected class and risk level.</span></div></div>
+          <div class="ab-feat"><div class="ab-feat-ico">💾</div><div class="ab-feat-text"><strong>Saved to History</strong><span>All patient context is stored alongside scan results for future reference in your history page.</span></div></div>
+        </div>
+      </div>
+      <div class="ab-card">
+        <div class="ab-card-icon">📦</div>
+        <h3>Batch Analysis Mode</h3>
+        <div class="ab-feat-list">
+          <div class="ab-feat"><div class="ab-feat-ico">🗂️</div><div class="ab-feat-text"><strong>Multiple Images at Once</strong><span>Upload up to 20 images in a single session to analyse an entire patient cohort simultaneously.</span></div></div>
+          <div class="ab-feat"><div class="ab-feat-ico">📊</div><div class="ab-feat-text"><strong>Batch Summary</strong><span>Get a risk breakdown summary (High / Medium / Low) across the entire batch at a glance.</span></div></div>
+          <div class="ab-feat"><div class="ab-feat-ico">📋</div><div class="ab-feat-text"><strong>Combined PDF Report</strong><span>Download a single combined multi-page PDF covering all images in the batch with a summary table.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AI MODELS ────────────────────────────────────────────── -->
+  <div class="ab-section">
+    <div class="ab-section-title">🤖 AI Models</div>
+    <div class="ab-grid-2">
+      <div class="ab-card">
+        <div class="ab-model-chips">
+          <div class="ab-model-chip">
+            <div class="mc-name">Brain Tumor Classifier</div>
+            <div class="mc-arch">ResNet-18 · PyTorch · 4-class softmax</div>
+            <div class="mc-classes">Classes: Glioma · Meningioma · No Tumor · Pituitary</div>
+            <div class="mc-desc">Fine-tuned on a multi-class MRI dataset. The model processes 224×224 normalised RGB images. Transfer learning from ImageNet pretrained weights with custom classification head.</div>
+          </div>
+          <div class="ab-model-chip">
+            <div class="mc-name">Skin Cancer Classifier</div>
+            <div class="mc-arch">ResNet-18 · PyTorch · 2-class softmax</div>
+            <div class="mc-classes">Classes: Benign · Malignant</div>
+            <div class="mc-desc">Trained on the HAM10000 dermatoscopic dataset. Applies the same 224×224 preprocessing pipeline with ImageNet normalisation for consistent feature extraction.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ab-card">
+        <h3>Model Performance</h3>
+        <p style="font-size:0.8rem;color:var(--text3);margin-bottom:12px">Training metrics on held-out validation sets:</p>
+        <div class="acc-row">
+          <div class="acc-label-row"><span>Brain Tumor — Overall Accuracy</span><span>~92%</span></div>
+          <div class="acc-bar-bg"><div class="acc-bar-fill" data-w="92"></div></div>
+        </div>
+        <div class="acc-row" style="margin-top:10px">
+          <div class="acc-label-row"><span>Glioma Detection</span><span>~95%</span></div>
+          <div class="acc-bar-bg"><div class="acc-bar-fill" data-w="95"></div></div>
+        </div>
+        <div class="acc-row" style="margin-top:10px">
+          <div class="acc-label-row"><span>Meningioma Detection</span><span>~88%</span></div>
+          <div class="acc-bar-bg"><div class="acc-bar-fill" data-w="88"></div></div>
+        </div>
+        <div class="acc-row" style="margin-top:10px">
+          <div class="acc-label-row"><span>Skin Cancer — Overall Accuracy</span><span>~89%</span></div>
+          <div class="acc-bar-bg"><div class="acc-bar-fill" data-w="89"></div></div>
+        </div>
+        <div class="acc-row" style="margin-top:10px">
+          <div class="acc-label-row"><span>Malignant Classification</span><span>~91%</span></div>
+          <div class="acc-bar-bg"><div class="acc-bar-fill" data-w="91"></div></div>
+        </div>
+        <p style="font-size:0.72rem;color:var(--text3);margin-top:14px">⚠ Metrics are indicative. Real-world performance depends on image quality and clinical context.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DATASETS ─────────────────────────────────────────────── -->
+  <div class="ab-section">
+    <div class="ab-section-title">📊 Training Datasets</div>
+    <div class="ab-card full" style="max-width:900px;margin:0 auto">
+      <div class="ab-dataset">
+        <div class="ds-dot2 brain"></div>
+        <div>
+          <strong>Brain MRI Dataset (Multi-class)</strong>
+          <p>A publicly available dataset of T1-weighted contrast-enhanced MRI scans covering four categories. Images were collected from multiple sources, augmented for class balance, and resized to 224×224 pixels. The dataset contains a diverse range of tumor sizes, locations, and patient demographics to improve generalisation.</p>
+          <div class="ds-stats">
+            <span class="ds-stat">~3,000 training images</span>
+            <span class="ds-stat">4 classes</span>
+            <span class="ds-stat">MRI · T1-weighted</span>
+            <span class="ds-stat">224×224 px</span>
+            <span class="ds-stat">Augmented</span>
+          </div>
+        </div>
+      </div>
+      <div class="ab-dataset">
+        <div class="ds-dot2 skin"></div>
+        <div>
+          <strong>HAM10000 — Human Against Machine with 10000 training images</strong>
+          <p>A large collection of multi-source dermatoscopic images of common pigmented skin lesions, originally released as a benchmark dataset for skin lesion analysis. For OnchoScan, the dataset is used in a binary classification setup (Benign vs. Malignant) to focus on clinical triage utility.</p>
+          <div class="ds-stats">
+            <span class="ds-stat">10,000+ images</span>
+            <span class="ds-stat">Binary classification</span>
+            <span class="ds-stat">Dermatoscopic</span>
+            <span class="ds-stat">Multi-source</span>
+            <span class="ds-stat">224×224 px</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GRAD-CAM ─────────────────────────────────────────────── -->
+  <div class="ab-section">
+    <div class="ab-section-title">🔬 Explainability — Grad-CAM</div>
+    <div class="ab-grid-2">
+      <div class="ab-card">
+        <div class="ab-card-icon">🌡️</div>
+        <h3>What is Grad-CAM?</h3>
+        <p>Gradient-weighted Class Activation Mapping (Grad-CAM) is a technique that produces a visual explanation for decisions made by CNNs. It uses the gradients flowing into the final convolutional layer to produce a coarse localisation map highlighting the important regions in the image for predicting the class.</p>
+        <p style="margin-top:10px">In plain terms: <strong style="color:var(--accent)">it shows you exactly which part of the scan the AI looked at</strong> to reach its conclusion — making the model's reasoning transparent and clinically reviewable.</p>
+        <div class="gradcam-visual" style="margin-top:14px">
+          <div class="gcv-box orig">🖼️<div class="gcv-label">Original Scan</div></div>
+          <div class="gcv-arrow">→</div>
+          <div class="gcv-box heat">🌡️<div class="gcv-label">Heatmap</div></div>
+          <div class="gcv-arrow">→</div>
+          <div class="gcv-box over">🔍<div class="gcv-label">Overlay</div></div>
+        </div>
+      </div>
+      <div class="ab-card">
+        <div class="ab-card-icon">💡</div>
+        <h3>How to Read the Heatmap</h3>
+        <div class="ab-feat-list">
+          <div class="ab-feat"><div class="ab-feat-ico" style="color:#ff4f7b">🔴</div><div class="ab-feat-text"><strong>Red / Hot Regions</strong><span>Highest activation — the model weighted these areas most heavily when making its prediction. Pay close attention to these zones during clinical review.</span></div></div>
+          <div class="ab-feat"><div class="ab-feat-ico" style="color:#ffb84f">🟡</div><div class="ab-feat-text"><strong>Yellow / Warm Regions</strong><span>Moderate activation — these areas contributed meaningfully to the prediction but were less decisive than red regions.</span></div></div>
+          <div class="ab-feat"><div class="ab-feat-ico" style="color:#4fffb0">🟢</div><div class="ab-feat-text"><strong>Blue / Cool Regions</strong><span>Low or no activation — these parts of the image had minimal influence on the model's decision.</span></div></div>
+          <div class="ab-feat"><div class="ab-feat-ico">✅</div><div class="ab-feat-text"><strong>Clinical Use</strong><span>If the heatmap highlights anatomically plausible regions (e.g. a tumor mass), it increases confidence in the prediction. Unexpected activations warrant caution.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RISK LEVELS ──────────────────────────────────────────── -->
+  <div class="ab-section">
+    <div class="ab-section-title">⚠️ Risk Level System</div>
+    <div class="ab-card full" style="max-width:900px;margin:0 auto">
+      <p style="font-size:0.88rem;color:var(--text2);line-height:1.7;margin-bottom:16px">OnchoScan assigns each prediction a risk level based on the model's confidence score and the predicted class. This is designed to help prioritise cases for clinical review.</p>
+      <table class="risk-table">
+        <thead>
+          <tr><th>Risk Level</th><th>Confidence Range</th><th>Typical Triggers</th><th>Recommended Action</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="rtag high">High Risk</span></td>
+            <td>≥ 70% on a malignant/tumour class</td>
+            <td>Glioma detected, Malignant skin lesion, Meningioma with high confidence</td>
+            <td>Immediate clinical review. Escalate to specialist. Do not rely on AI alone.</td>
+          </tr>
+          <tr>
+            <td><span class="rtag medium">Medium Risk</span></td>
+            <td>40–70% on a malignant/tumour class</td>
+            <td>Pituitary tumor, moderate confidence malignant, ambiguous lesion</td>
+            <td>Schedule follow-up imaging. Monitor closely. Consider second opinion.</td>
+          </tr>
+          <tr>
+            <td><span class="rtag low">Low Risk</span></td>
+            <td>High confidence on benign/no-tumor class</td>
+            <td>No Tumor detected, Benign lesion with high confidence</td>
+            <td>Routine monitoring. Continue standard screening schedule.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── SYSTEM PIPELINE ──────────────────────────────────────── -->
+  <div class="ab-section">
+    <div class="ab-section-title">⚙️ System Pipeline</div>
+    <div class="ab-card full" style="max-width:900px;margin:0 auto">
+      <div class="ab-pipeline">
+        <div class="pipe-node"><div class="pn-ico">📤</div><div class="pn-name">Upload</div><div class="pn-desc">JPEG / PNG / TIFF / WEBP accepted</div></div>
+        <div class="pipe-arrow-h">→</div>
+        <div class="pipe-node"><div class="pn-ico">⚙️</div><div class="pn-name">Preprocess</div><div class="pn-desc">Resize 224×224, normalise, tensor convert</div></div>
+        <div class="pipe-arrow-h">→</div>
+        <div class="pipe-node"><div class="pn-ico">🤖</div><div class="pn-name">Inference</div><div class="pn-desc">ResNet-18 forward pass, softmax output</div></div>
+        <div class="pipe-arrow-h">→</div>
+        <div class="pipe-node"><div class="pn-ico">🌡️</div><div class="pn-name">Grad-CAM</div><div class="pn-desc">Gradient maps, heatmap overlay generated</div></div>
+        <div class="pipe-arrow-h">→</div>
+        <div class="pipe-node"><div class="pn-ico">📊</div><div class="pn-name">Risk Score</div><div class="pn-desc">Confidence → risk level classification</div></div>
+        <div class="pipe-arrow-h">→</div>
+        <div class="pipe-node"><div class="pn-ico">🧠</div><div class="pn-name">Llama 3</div><div class="pn-desc">AI clinical recommendation generation</div></div>
+        <div class="pipe-arrow-h">→</div>
+        <div class="pipe-node"><div class="pn-ico">📄</div><div class="pn-name">PDF Report</div><div class="pn-desc">ReportLab clinical report generated</div></div>
+      </div>
+      <div class="ab-steps">
+        <div class="ab-step"><div class="ab-step-num">1</div><div class="ab-step-body"><strong>Image Upload & Validation</strong><span>The user uploads a medical image. The backend validates file type and size, then opens it with Pillow and converts to RGB to ensure consistent colour channel handling regardless of the original format.</span></div></div>
+        <div class="ab-step"><div class="ab-step-num">2</div><div class="ab-step-body"><strong>Preprocessing Pipeline</strong><span>The image is resized to 224×224 pixels, converted to a PyTorch tensor, and normalised using ImageNet mean [0.485, 0.456, 0.406] and std [0.229, 0.224, 0.225]. This matches the statistics used during ResNet-18 pretraining.</span></div></div>
+        <div class="ab-step"><div class="ab-step-num">3</div><div class="ab-step-body"><strong>Model Inference</strong><span>The preprocessed tensor is passed through the ResNet-18 model in evaluation mode. The output logits are converted to probabilities via softmax. The class with the highest probability is the prediction, alongside a confidence score.</span></div></div>
+        <div class="ab-step"><div class="ab-step-num">4</div><div class="ab-step-body"><strong>Grad-CAM Heatmap Generation</strong><span>Gradients of the predicted class score with respect to the last convolutional layer's feature maps are computed. These are globally average-pooled to get channel weights, which are then used to produce a weighted activation map. The map is upsampled and overlaid on the original image.</span></div></div>
+        <div class="ab-step"><div class="ab-step-num">5</div><div class="ab-step-body"><strong>Risk Scoring</strong><span>The confidence score and predicted class are mapped to a 0–100 risk score. Based on this score, a risk level (High / Medium / Low) is assigned to help prioritise clinical review.</span></div></div>
+        <div class="ab-step"><div class="ab-step-num">6</div><div class="ab-step-body"><strong>Llama 3 Clinical Recommendations</strong><span>The prediction, confidence, cancer type, and risk level are sent to a Llama 3 recommendation layer, which generates short, point-wise AI clinical recommendations tailored to the model output.</span></div></div>
+        <div class="ab-step"><div class="ab-step-num">7</div><div class="ab-step-body"><strong>PDF Report Generation</strong><span>ReportLab assembles a structured clinical PDF containing the prediction result, risk gauge, class probabilities table, Grad-CAM images, patient notes, diagnostic text, and Llama 3 generated clinical recommendations. The report is saved server-side and a download link is provided.</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TECH STACK ───────────────────────────────────────────── -->
+  <div class="ab-section">
+    <div class="ab-section-title">🛠️ Technology Stack</div>
+    <div class="ab-card full" style="max-width:900px;margin:0 auto">
+      <div class="ab-grid-2" style="gap:20px">
+        <div>
+          <h4>Backend</h4>
+          <div class="ab-tech-grid" style="margin-top:10px">
+            <div class="ab-tech"><span class="t-name">FastAPI</span><span class="t-role">REST API framework</span></div>
+            <div class="ab-tech"><span class="t-name">PyTorch</span><span class="t-role">Deep learning inference</span></div>
+            <div class="ab-tech"><span class="t-name">ResNet-18</span><span class="t-role">CNN architecture</span></div>
+            <div class="ab-tech"><span class="t-name">Pillow</span><span class="t-role">Image processing</span></div>
+            <div class="ab-tech"><span class="t-name">ReportLab</span><span class="t-role">PDF generation</span></div>
+            <div class="ab-tech"><span class="t-name">Llama 3</span><span class="t-role">Clinical recommendation generation</span></div>
+            <div class="ab-tech"><span class="t-name">SQLite</span><span class="t-role">Scan history storage</span></div>
+            <div class="ab-tech"><span class="t-name">JWT Auth</span><span class="t-role">Secure authentication</span></div>
+            <div class="ab-tech"><span class="t-name">bcrypt</span><span class="t-role">Password hashing</span></div>
+          </div>
+        </div>
+        <div>
+          <h4>Frontend</h4>
+          <div class="ab-tech-grid" style="margin-top:10px">
+            <div class="ab-tech"><span class="t-name">HTML5</span><span class="t-role">Markup</span></div>
+            <div class="ab-tech"><span class="t-name">CSS3</span><span class="t-role">Styling & animations</span></div>
+            <div class="ab-tech"><span class="t-name">Vanilla JS</span><span class="t-role">UI logic & fetch API</span></div>
+            <div class="ab-tech"><span class="t-name">Space Grotesk</span><span class="t-role">Typography</span></div>
+            <div class="ab-tech"><span class="t-name">DM Serif</span><span class="t-role">Display typography</span></div>
+            <div class="ab-tech"><span class="t-name">Grad-CAM Vis</span><span class="t-role">Heatmap rendering</span></div>
+            <div class="ab-tech"><span class="t-name">LocalStorage</span><span class="t-role">Auth token storage</span></div>
+            <div class="ab-tech"><span class="t-name">Fetch API</span><span class="t-role">Async HTTP calls</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HOW TO USE ───────────────────────────────────────────── -->
+  <div class="ab-section">
+    <div class="ab-section-title">📖 How to Use OnchoScan</div>
+    <div class="ab-grid-2">
+      <div class="ab-card">
+        <div class="ab-card-icon">⚡</div>
+        <h3>Single Image Analysis</h3>
+        <div class="ab-steps">
+          <div class="ab-step"><div class="ab-step-num">1</div><div class="ab-step-body"><strong>Go to Predict</strong><span>Navigate to the Predict page from the navigation bar.</span></div></div>
+          <div class="ab-step"><div class="ab-step-num">2</div><div class="ab-step-body"><strong>Select Cancer Type</strong><span>Choose Brain Tumor or Skin Cancer depending on the image you have.</span></div></div>
+          <div class="ab-step"><div class="ab-step-num">3</div><div class="ab-step-body"><strong>Add Patient Notes (optional)</strong><span>Fill in patient name, age, sex, symptoms and any clinical notes for the report.</span></div></div>
+          <div class="ab-step"><div class="ab-step-num">4</div><div class="ab-step-body"><strong>Upload & Analyse</strong><span>Drag and drop or browse for your image, then click Run Analysis.</span></div></div>
+          <div class="ab-step"><div class="ab-step-num">5</div><div class="ab-step-body"><strong>Review Results</strong><span>View prediction, confidence, Grad-CAM heatmap, and download the PDF report.</span></div></div>
+        </div>
+      </div>
+      <div class="ab-card">
+        <div class="ab-card-icon">📦</div>
+        <h3>Batch Analysis</h3>
+        <div class="ab-steps">
+          <div class="ab-step"><div class="ab-step-num">1</div><div class="ab-step-body"><strong>Go to Batch</strong><span>Navigate to the Batch page from the navigation bar.</span></div></div>
+          <div class="ab-step"><div class="ab-step-num">2</div><div class="ab-step-body"><strong>Select Cancer Type</strong><span>All images in a batch must be of the same type (Brain or Skin).</span></div></div>
+          <div class="ab-step"><div class="ab-step-num">3</div><div class="ab-step-body"><strong>Add Patient Notes</strong><span>One set of patient notes applies to all images in the batch — suitable for a single patient with multiple scans.</span></div></div>
+          <div class="ab-step"><div class="ab-step-num">4</div><div class="ab-step-body"><strong>Upload up to 20 Images</strong><span>Drag and drop multiple files or use the file browser to select them all at once.</span></div></div>
+          <div class="ab-step"><div class="ab-step-num">5</div><div class="ab-step-body"><strong>Run & Download</strong><span>Click Run Batch Analysis. Once complete, view per-image results and download the Combined PDF report.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FAQ ─────────────────────────────────────────────────── -->
+  <div class="ab-section">
+    <div class="ab-section-title">❓ Frequently Asked Questions</div>
+    <div class="ab-card full" style="max-width:900px;margin:0 auto">
+      <div class="ab-faq" id="faqList">
+        <div class="faq-item">
+          <button class="faq-q" type="button">What image formats does OnchoScan accept?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></button>
+          <div class="faq-a">OnchoScan accepts JPEG, PNG, TIFF, and WEBP image formats. For best results, use high-resolution clinical images. The system automatically converts all images to RGB and resizes them to 224×224 pixels for model input.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">How accurate is the AI prediction?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></button>
+          <div class="faq-a">The models achieve approximately 88–95% accuracy on their respective validation sets. However, real-world accuracy depends heavily on image quality, acquisition conditions, and patient demographics. Always treat the AI output as a decision-support tool, not a definitive diagnosis. Consult a qualified radiologist or dermatologist for clinical decisions.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">Is my patient data stored securely?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></button>
+          <div class="faq-a">Scan results, patient notes, and reports are stored in a local SQLite database on your server, protected by JWT authentication. Each user can only access their own data. You can delete individual records from the History page or clear all profile data from the Profile settings. OnchoScan is designed for local deployment and does not send data to any external service.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">What does the confidence percentage mean?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></button>
+          <div class="faq-a">The confidence percentage is the softmax probability assigned to the predicted class, expressed as a percentage. A 95% confidence means the model assigned 95% of its probability mass to that class. Higher confidence does not guarantee correctness — it indicates the model's internal certainty. Low confidence predictions (below 60%) warrant extra clinical caution.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">Can I use OnchoScan for real clinical diagnoses?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></button>
+          <div class="faq-a">No. OnchoScan is strictly an AI-assisted research and educational tool. It is not FDA-cleared or CE-marked as a medical device. It must not be used as the sole basis for any clinical decision, patient management, or treatment planning. Always consult qualified healthcare professionals for medical diagnosis and treatment.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">Why does the Grad-CAM heatmap sometimes highlight unexpected areas?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></button>
+          <div class="faq-a">CNNs can pick up on image artefacts, metadata burned into scans, or spurious correlations in the training data. If the heatmap highlights clearly non-anatomical regions (e.g., image borders, scanner labels), treat the prediction with additional scepticism. This is precisely why human clinical review remains essential.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">How do I delete my scan history?<svg class="faq-chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></button>
+          <div class="faq-a">Go to the History page. You can select individual records using the checkboxes on each row, use "Select All" to select everything, and then click "Delete Selected". A confirmation modal will appear before any deletion is performed. Deleted records cannot be recovered.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DISCLAIMER ───────────────────────────────────────────── -->
+  <div class="ab-disclaimer">
+    <div class="ab-disclaimer-icon">⚠️</div>
+    <div>
+      <h3>Medical Disclaimer</h3>
+      <p>OnchoScan is an <strong>AI-assisted research and educational tool only</strong>. It is <strong>NOT</strong> intended to replace, supplement, or be used in conjunction with professional medical advice, diagnosis, or treatment. The predictions, risk assessments, and clinical recommendations generated by this system are for informational and research purposes only. <strong>Always consult a qualified and licensed healthcare professional</strong> before making any medical decision. Never disregard professional medical advice or delay seeking it because of something you have read or seen in OnchoScan. The developers and contributors assume no liability for any clinical decisions made based on this tool.</p>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer"><div class="footer-inner">
+  <div class="footer-brand"><div class="logo-icon sm"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#4fffb0" stroke-width="2"/><path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="#4fffb0" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="20" cy="20" r="3" fill="#4fffb0"/></svg></div>OnchoScan</div>
+  <p class="footer-disclaimer">⚠ For research and educational use only.</p>
+  <p class="footer-copy">© 2025 OnchoScan · Powered by ResNet18 + Grad-CAM</p>
+</div></footer>
+
+<script src="app.js"></script>
+<script>
+// Animate accuracy bars on scroll
+(function() {
+  var bars = document.querySelectorAll('.acc-bar-fill');
+  var animated = false;
+  function animate() {
+    if (animated) return;
+    bars.forEach(function(b) { b.style.width = (b.dataset.w || 0) + '%'; });
+    animated = true;
+  }
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if (e.isIntersecting) animate(); });
+  }, { threshold: 0.3 });
+  bars.forEach(function(b) { obs.observe(b); });
+})();
+
+// FAQ accordion
+document.querySelectorAll('.faq-q').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var item = btn.closest('.faq-item');
+    var wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+</script>
+<script src="features.js"></script>
+</body>
+</html>
