@@ -1,15 +1,16 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-green)](https://fastapi.tiangolo.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-green)](https://fastapi.tiangolo.com/)
 
-## Project Info
+# Onchoscan
 
-**Onchoscan** is an intelligent multi-cancer detection and analysis platform that leverages deep learning models to assist healthcare professionals in early cancer diagnosis. The system provides real-time predictions, comprehensive patient analytics, and detailed medical reports for multiple cancer types including brain and skin cancers.
+**Onchoscan** is an intelligent multi-cancer detection and analysis platform that leverages deep learning models to assist healthcare professionals in early cancer diagnosis. The system provides real-time predictions, comprehensive patient analytics, and detailed medical reports for brain and skin cancers.
 
-**Project Type:** Medical AI/ML Application  
-**Current Version:** 1.0.0  
+**Project Type:** Medical AI/ML Application
+**Current Version:** 1.0.0
 **Last Updated:** May 2026
 
+---
 
 ## Table of Contents
 
@@ -29,92 +30,115 @@
 ## Features
 
 ### Core Features
-- **Multi-Cancer Detection**: Support for multiple cancer types (Brain, Skin)
-- **AI-Powered Analysis**: Deep learning models for accurate predictions
-- **Patient Dashboard**: Comprehensive patient information management
-- **Real-time Analytics**: Interactive analytics and visualization
-- **Batch Processing**: Process multiple patient records simultaneously
-- **Report Generation**: Automated medical report creation with predictions
-- **Patient History**: Track and compare historical patient data
-- **Recommendation Engine**: AI-driven clinical recommendations based on analysis
-- **Authentication System**: Secure user login and role-based access
+- **Multi-Cancer Detection** — Support for Brain and Skin cancer types
+- **AI-Powered Analysis** — Deep learning models with Grad-CAM heatmap explainability
+- **Patient Dashboard** — Comprehensive patient information management
+- **Real-time Analytics** — Interactive analytics and visualization
+- **Batch Processing** — Process multiple patient records via CSV upload
+- **Report Generation** — Automated PDF medical report creation
+- **Patient History** — Track and compare historical patient data
+- **Recommendation Engine** — AI-driven clinical recommendations via Groq (Llama 3)
+- **Authentication System** — Secure login with JWT-based session management
 
 ### Advanced Features
 - Comparative analysis between patient records
-- Export functionality for reports
-- Real-time model inference
+- Grad-CAM heatmap visualization for model explainability
 - Patient profile management
+- Export functionality for reports
 
 ---
 
 ## Project Architecture
 
-### Architecture Overview
-
 ```
-Onchoscan/
-├── Frontend (Web UI)
-│   ├── Dashboard & Analytics
-│   ├── Patient Management
-│   ├── Authentication
-│   └── Report Viewer
+onchoscan/
+├── backend/
+│   ├── app.py                      # FastAPI application entry point
+│   ├── model_loader.py             # Loads brain and skin models
+│   ├── predict.py                  # Inference engine
+│   ├── report_generator.py         # Single patient PDF report
+│   ├── batch_report_generator.py   # Bulk report generation
+│   ├── recommendation_engine.py    # Groq LLM recommendations
+│   ├── landing.html                # Landing page served by FastAPI
+│   ├── onchoscan.db                # SQLite database
+│   ├── requirements.txt
+│   ├── runtime.txt
+│   ├── outputs/                    # Prediction output files
+│   ├── reports/                    # Generated PDF reports
+│   └── .gitignore
 │
-├── Backend (API Server)
-│   ├── FastAPI Application
-│   ├── Model Inference Engine
-│   ├── Report Generator
-│   ├── Recommendation Engine
-│   └── Database Layer
+├── frontend/
+│   ├── index.html                  # Entry point
+│   ├── home.html
+│   ├── dashboard.html
+│   ├── analytics.html
+│   ├── batch.html
+│   ├── compare.html
+│   ├── history.html
+│   ├── about.html
+│   ├── profile.html
+│   ├── style.css
+│   ├── patient_notes.css
+│   ├── profile.css
+│   ├── app.js
+│   ├── auth.js
+│   ├── script.js
+│   ├── features.js
+│   ├── patient_notes.js
+│   ├── profile.js
+│   └── patients/
 │
-└── ML Models
-    ├── Brain Cancer Model
-    ├── Skin Cancer Model
-    └── Model Loader
+├── models/
+│   ├── brain_model.pth
+│   └── skin_model.pth
+│
+├── LICENSE
+└── README.md
 ```
 
 ### Component Description
 
 | Component | Purpose | Technology |
-|-----------|---------|-----------|
-| **Frontend** | User interface and interaction | HTML5, CSS3, JavaScript |
-| **Backend API** | Core business logic and inference | FastAPI, Python 3.8+ |
-| **ML Models** | Cancer detection predictions | PyTorch, Deep Learning |
-| **Report Generator** | Automated medical report creation | ReportLab |
+|-----------|---------|------------|
+| **Frontend** | User interface and interaction | HTML5, CSS3, JavaScript (ES6+) |
+| **Backend API** | Core business logic and inference | FastAPI 0.110.0, Python |
+| **ML Models** | Cancer detection predictions | PyTorch, ResNet18 |
+| **Report Generator** | Automated PDF report creation | ReportLab |
 | **Database** | Patient and prediction data storage | SQLite |
-| **LLM Integration** | AI recommendations | Groq API (Llama 3) |
+| **LLM Integration** | AI-driven recommendations | Groq API (Llama 3) |
+| **Explainability** | Visual heatmap generation | Grad-CAM |
 
 ---
 
 ## Tools and Technologies
 
 ### Backend
-- **Framework**: FastAPI 0.100+
+- **Framework**: FastAPI 0.110.0
 - **Language**: Python 3.8+
-- **Server**: Uvicorn (ASGI)
-- **ML Framework**: PyTorch
-- **Data Processing**: NumPy, Pandas
-- **API Documentation**: OpenAPI/Swagger (built-in)
-- **Authentication**: OAuth2 with JWT tokens
+- **Server**: Uvicorn 0.29.0 (ASGI)
+- **Authentication**: OAuth2 with JWT (python-jose 3.3.0)
+- **Password Hashing**: bcrypt 4.0.1
+- **File Uploads**: python-multipart 0.0.9
 - **Database**: SQLite
 - **LLM Integration**: Groq API (Llama 3)
+- **API Documentation**: OpenAPI/Swagger (built-in with FastAPI)
+
+### ML / Data Science
+- **ML Framework**: PyTorch 2.2.2
+- **Vision Library**: Torchvision 0.17.2
+- **Model Architecture**: ResNet18 (transfer learning from ImageNet)
+- **Model Format**: `.pth` (PyTorch serialized)
+- **Image Processing**: Pillow 10.3.0, OpenCV 4.9.0 (headless)
+- **Numerical Computing**: NumPy 1.26.4
+- **Explainability**: Grad-CAM 1.5.2
 
 ### Frontend
 - **HTML5**: Semantic markup and structure
 - **CSS3**: Responsive styling and animations
-- **JavaScript (ES6+)**: Dynamic interactions and AJAX
+- **JavaScript (ES6+)**: Dynamic interactions and AJAX calls to backend API
 
-### ML/Data Science
-- **Model Framework**: PyTorch
-- **Model Architecture**: ResNet18 (transfer learning from ImageNet)
-- **Model Format**: .pth (PyTorch serialized models)
-- **Image Processing**: Pillow, OpenCV
-- **Numerical Computing**: NumPy, SciPy
-- **Explainability**: Grad-CAM for heatmap visualization
-
-### Deployment
-- **Runtime**: Python 3.8+
-- **Package Manager**: pip
-- **Version Control**: Git
+### Report Generation
+- **ReportLab 4.1.0**: PDF generation for medical reports
 
 ---
 
@@ -122,90 +146,32 @@ Onchoscan/
 
 ### 1. User Authentication
 ```
-User Access
-    ↓
-Login System (auth.js)
-    ↓
-Session Management
-    ↓
-Dashboard Access
+User Access → Login (auth.js) → JWT Token Issued → Dashboard Access
 ```
 
-### 2. Patient Data Entry
+### 2. Cancer Detection
 ```
-New Patient
-    ↓
-Form Submission
-    ↓
-Backend Validation
-    ↓
-Database Storage
+Image Upload → Preprocessing → model_loader.py → predict.py → Confidence Score + Grad-CAM
 ```
 
-### 3. Cancer Detection Workflow
+### 3. Report Generation
 ```
-Medical Image Upload
-    ↓
-Image Preprocessing
-    ↓
-Model Loader (model_loader.py)
-    ↓
-Inference Engine (predict.py)
-    ↓
-Prediction Generation
-    ↓
-Confidence Score Calculation
+Prediction Results → report_generator.py → PDF Report → Download
 ```
 
-### 4. Report Generation
+### 4. Recommendation Engine
 ```
-Prediction Results
-    ↓
-Report Generator (report_generator.py)
-    ↓
-Template Rendering
-    ↓
-HTML Report Creation
-    ↓
-PDF Export (optional)
+Patient Data + Prediction → recommendation_engine.py → Groq API (Llama 3) → Clinical Recommendations
 ```
 
-### 5. Recommendation Engine
+### 5. Batch Processing
 ```
-Patient Data + Predictions
-    ↓
-Recommendation Engine (recommendation_engine.py)
-    ↓
-Clinical Analysis
-    ↓
-Recommendation Generation
-    ↓
-Report Integration
+CSV Upload → batch_report_generator.py → Parallel Inference → Bulk PDF Reports → ZIP Download
 ```
 
-### 6. Batch Processing
-Multiple Patient Records
-    ↓
-Batch Report Generator (batch_report_generator.py)
-    ↓
-Parallel Processing
-    ↓
-Bulk Report Generation
-    ↓
-Results Storage
+### 6. Analytics Dashboard
 ```
-
-### 7. Analytics & Dashboard
-```
-Patient Database
-    ↓
-Data Aggregation
-    ↓
-Analytics Calculation
-    ↓
-Dashboard Visualization (analytics.html)
-    ↓
-Real-time Updates
+SQLite Database → Data Aggregation → analytics.html → Real-time Visualization
 ```
 
 ---
@@ -214,282 +180,198 @@ Real-time Updates
 
 ### Prerequisites
 - Python 3.8 or higher
-- pip (Python package manager)
+- pip
 - Git
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 
-### Backend Setup
+### 1. Clone the Repository
 
-1. **Clone the repository**
-git clone https://github.com/yourusername/onchoscan.git
+```bash
+git clone https://github.com/ashwin007-ai/onchoscan.git
 cd onchoscan
 ```
 
-2. **Navigate to backend directory**
+### 2. Backend Setup
+
 ```bash
 cd backend
-```
 
-3. **Create virtual environment**
-```bash
+# Create virtual environment
 python -m venv venv
 
-# Windows
+# Activate — Windows
 venv\Scripts\activate
 
-# macOS/Linux
+# Activate — macOS/Linux
 source venv/bin/activate
-```
 
-4. **Install dependencies**
-```bash
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-5. **Verify model files**
-Ensure the following model files are in the `models/` directory:
-- `brain_model.pth`
-- `skin_model.pth`
+### 3. Verify Model Files
 
-### Frontend Setup
+Ensure the following files exist in the `models/` directory at the project root:
 
-1. **Navigate to frontend directory**
-```bash
+```
+models/
+├── brain_model.pth
+└── skin_model.pth
 ```
 
-2. **No installation required** - Frontend runs on HTML/CSS/JavaScript
-   Simply open `index.html` in your browser or serve with a local server
+> If you trained the models yourself using the training scripts, copy the `.pth` files from your output directory into `models/`.
 
-3. **Optional: Start a local server**
-```bash
-# Python 3
-python -m http.server 8000
+### 4. Start the Backend Server
 
-# Then open http://localhost:8000
-```
-
-### Running the Application
-
-1. **Start Backend Server (FastAPI)**
 ```bash
 cd backend
-python -m uvicorn app:app --reload
+uvicorn app:app --reload
 ```
-Server will run on: `http://localhost:8000`
 
-Automatic API documentation:
+Backend runs at: `http://localhost:8000`
+
+API documentation available at:
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 
-2. **Start Frontend**
+### 5. Start the Frontend
+
 ```bash
 cd frontend
 
-# Option 1: Open in browser
-# Double-click index.html or open in browser
+# Option 1: Open index.html directly in your browser
 
-# Option 2: Run local server
+# Option 2: Serve with Python
 python -m http.server 8001
-# Access at http://localhost:8001
+# Then open http://localhost:8001
 ```
-
-- Open `http://localhost:8001` (or your frontend port)
-- Login with credentials
-- Navigate to Dashboard
 
 ---
 
 ## Usage
 
-### Main Navigation
-- **Home**: Landing page and quick overview
-- **Predict**: Upload medical image and run cancer detection analysis
-- **Batch**: Process multiple images at once (CSV upload)
-- **History**: View all past predictions and analyses
-- **Compare**: Compare multiple predictions side-by-side
-- **Analytics**: View system statistics and trends
-- **About**: Project information
+### Main Pages
+
+| Page | URL | Purpose |
+|------|-----|---------|
+| Home | `/home.html` | Landing overview |
+| Predict | `/dashboard.html` | Upload image and run prediction |
+| Batch | `/batch.html` | Process multiple images via CSV |
+| History | `/history.html` | View all past predictions |
+| Compare | `/compare.html` | Side-by-side prediction comparison |
+| Analytics | `/analytics.html` | Stats and trends |
+| Profile | `/profile.html` | User profile management |
+| About | `/about.html` | Project information |
 
 ### Running a Prediction
-1. Navigate to **Predict** page
-2. Upload medical image (Brain MRI or Skin image)
-3. Select cancer type (Brain or Skin)
-4. Click analyze/predict
-5. View results with:
-    - Prediction (Positive/Negative)
-    - Confidence score (%)
-    - Grad-CAM heatmap visualization
-    - Risk level assessment
-6. Download PDF report if needed
+
+1. Go to the **Dashboard** page
+2. Upload a medical image (Brain MRI or Skin lesion image)
+3. Select the cancer type (Brain or Skin)
+4. Click **Analyze**
+5. View results:
+   - Prediction label and confidence score (%)
+   - Grad-CAM heatmap showing regions of interest
+   - Risk level assessment
+6. Download the PDF report if needed
 
 ### Batch Processing
-1. Navigate to **Batch** page
-2. Upload CSV file with image paths and patient info
-3. System processes all images simultaneously
-4. Download all reports as ZIP file
-5. Results are stored in database for future reference
+
+1. Go to the **Batch** page
+2. Upload a CSV file containing image paths and patient info
+3. The system processes all images and generates reports
+4. Download all reports as a ZIP file
 
 ### Compare Predictions
-1. Go to **Compare** page
-2. Select two or more previous predictions
-3. View side-by-side analysis
-4. Compare confidence scores and visualizations
 
-### View History & Analytics
-1. **History** page: Browse all past predictions with filters
-2. **Analytics** page: View statistics, model performance, and trends
+1. Go to the **Compare** page
+2. Select two or more past predictions
+3. View side-by-side confidence scores and visualizations
 
 ---
 
+## Troubleshooting
 
+**Model files not found**
+```
+Ensure models/brain_model.pth and models/skin_model.pth exist.
+```
+
+**Port already in use**
+```bash
+uvicorn app:app --reload --port 8001
+```
+
+**Dependency installation fails**
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt --no-cache-dir
+```
+
+**CORS errors in browser**
+```
+CORS is already configured in app.py via FastAPI's CORSMiddleware.
+If issues persist, ensure the backend is running before opening the frontend.
+```
+
+---
 
 ## Future Enhancements
 
-### Phase 2 Features
+### Cancer Detection
 - [ ] Support for additional cancer types (Lung, Breast, Colorectal)
-- [ ] 3D medical image analysis
 - [ ] Multi-model ensemble predictions
-- [ ] Confidence interval calculations
+- [ ] 3D medical image analysis
 
-- [ ] Advanced caching mechanisms
+### Infrastructure
+- [ ] Containerization with Docker
+- [ ] Cloud deployment (AWS / Azure / GCP)
+- [ ] CI/CD pipeline with GitHub Actions
+- [ ] Automated test suite with pytest
 - [ ] Real-time WebSocket updates
-- [ ] Containerization (Docker/Kubernetes)
-- [ ] Cloud deployment (AWS/Azure/GCP)
-- [ ] Automated testing suite (pytest)
-- [ ] CI/CD pipeline (GitHub Actions)
 
-### AI/ML Enhancements
-- [ ] Model fine-tuning capabilities
-- [ ] Transfer learning implementations
+### AI/ML
+- [ ] LIME/SHAP integration alongside existing Grad-CAM
+- [ ] Model versioning and tracking (MLflow)
 - [ ] Federated learning support
-- [ ] Explainable AI (XAI) integration
-- [ ] Model versioning and tracking
 
-- [ ] Note: Grad-CAM explainability is already integrated (visual heatmaps). Consider expanding XAI with LIME/SHAP and explanation dashboards.
-- [ ] ResNet18 used as base architecture; models are fine-tuned via transfer learning from ImageNet. Continue work on model tuning and monitoring.
-
+### Security & Compliance
 - [ ] HIPAA compliance implementation
 - [ ] End-to-end encryption
-- [ ] Advanced audit logging
 - [ ] Two-factor authentication
 - [ ] Data anonymization tools
 
 ### User Experience
 - [ ] Mobile application (iOS/Android)
-- [ ] Advanced visualization dashboards
 - [ ] Real-time notifications
 - [ ] Telemedicine integration
 
 ---
 
-## Installation Troubleshooting
-
-### Common Issues
-**Issue: Model files not found**
-```
-Solution: Ensure models/ directory contains:
-- brain_model.pth
-- skin_model.pth
-```
-
-**Issue: Port already in use**
-```
-Solution: Change port:
-python -m uvicorn app:app --reload --port 8001
-```
-
-**Issue: Dependencies installation fails**
-```
-Solution:
-pip install --upgrade pip
-pip install -r requirements.txt --no-cache-dir
-```
-
-**Issue: CORS errors**
-```
-Solution: CORS middleware is already configured in your FastAPI app:
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-```
-
----
-
 ## License
 
-This project is licensed under the **MIT License** - see the LICENSE file for details.
-
-### MIT License Summary
-- ✅ Commercial use
-- ✅ Modification
-- ✅ Distribution
-- ✅ Private use
-- ⚠️ Liability limited
-- ⚠️ Warranty not provided
-```
-MIT License
-
-Copyright (c) 2026 [Your Name/Organization]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-```
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## Contributing
 
-Contributions are welcome! Please follow these steps:
-
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m 'Add your feature'`
+4. Push to branch: `git push origin feature/your-feature`
 5. Open a Pull Request
 
-### Code Standards
-- Follow PEP 8 for Python code
-- Use meaningful variable names
-- Add comments for complex logic
-- Include docstrings for functions
-- Test before submitting PR
+Please follow PEP 8 for Python code and include docstrings for all functions.
 
 ---
 
 ## Contact
 
-**Project Maintainer**: P Ashwin Kumar  
-**Email**: ashwinkumarp2004@gmail.com  
-**GitHub**: [@ashwin007-ai](https://github.com/ashwin007-ai)  
-**LinkedIn**: [https://www.linkedin.com/in/ashwinkumarpaswan/]
-
-### Support
-For issues and questions:
-- Create an issue on GitHub
-- Check existing documentation
-- Review FAQ section
-
----
-
-## Acknowledgments
-
-- Thanks to the open-source community
-- PyTorch team for the ML framework
- - FastAPI community for the web framework
-- All contributors and testers
+**Project Maintainer**: P Ashwin Kumar
+**Email**: ashwinkumarp2004@gmail.com
+**GitHub**: [@ashwin007-ai](https://github.com/ashwin007-ai)
+**LinkedIn**: [ashwinkumarpaswan](https://www.linkedin.com/in/ashwinkumarpaswan/)
 
 ---
 
@@ -497,12 +379,9 @@ For issues and questions:
 
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
 - [PyTorch Documentation](https://pytorch.org/docs/)
-- [Medical Image Analysis](https://en.wikipedia.org/wiki/Medical_image_computing)
-- [Deep Learning in Healthcare](https://www.ibm.com/cloud/blog/deep-learning-healthcare)
+- [Grad-CAM Paper](https://arxiv.org/abs/1610.02391)
 - [Groq API Documentation](https://console.groq.com/docs)
 
 ---
 
-**Last Updated**: May 2026  
-**Status**: Active Development  
-**Version**: 1.0.0" 
+*Last Updated: May 2026 | Version: 1.0.0 | Status: Active Development*
