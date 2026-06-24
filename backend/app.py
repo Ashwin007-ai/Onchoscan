@@ -14,7 +14,7 @@ from predict import predict_cancer
 from report_generator import generate_pdf_report
 from batch_report_generator import generate_batch_pdf_report
 
-SECRET_KEY = "your-secret-key-change-in-production-please"
+SECRET_KEY = "Ashwin@2004"
 ALGORITHM  = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
