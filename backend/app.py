@@ -49,7 +49,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── SQLite ─────────────────────────────────────────────────────────────────────
+#SQLite
 DB_PATH = "onchoscan.db"
 
 def get_db():
@@ -118,7 +118,7 @@ def init_db():
 
 init_db()
 
-# ── Auth helpers ───────────────────────────────────────────────────────────────
+#Authorization helpers
 pwd_context   = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -177,7 +177,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     if not user: raise exc
     return dict(user)
 
-# ── Routes ─────────────────────────────────────────────────────────────────────
+#Rouutes
 @app.get("/")
 def home():
     landing = os.path.join(os.path.dirname(os.path.abspath(__file__)), "landing.html")
@@ -232,7 +232,7 @@ def me(current_user: dict = Depends(get_current_user)):
     return {"username": current_user["username"], "email": current_user["email"],
             "full_name": current_user["full_name"], "total_predictions": count}
 
-# ── GET Profile ────────────────────────────────────────────────────────────────
+#GET Profile
 @app.get("/profile")
 def get_profile(current_user: dict = Depends(get_current_user)):
     safe = {k: v for k, v in current_user.items() if k != "hashed_password"}
@@ -245,7 +245,7 @@ def get_profile(current_user: dict = Depends(get_current_user)):
     safe["total_scans"] = count
     return safe
 
-# ── PUT Profile ────────────────────────────────────────────────────────────────
+#PUT Profile
 @app.put("/profile")
 def update_profile(data: ProfileUpdate, current_user: dict = Depends(get_current_user)):
     conn = get_db()
@@ -278,7 +278,7 @@ def update_profile(data: ProfileUpdate, current_user: dict = Depends(get_current
     conn.close()
     return {"ok": True, "message": "Profile updated"}
 
-# ── Change Password ────────────────────────────────────────────────────────────
+# password changing
 @app.post("/change-password")
 def change_password(data: ChangePassword, current_user: dict = Depends(get_current_user)):
     if not verify_password(data.current_password, current_user["hashed_password"]):
@@ -292,7 +292,7 @@ def change_password(data: ChangePassword, current_user: dict = Depends(get_curre
     conn.close()
     return {"ok": True, "message": "Password changed successfully"}
 
-# ── Clear Profile Data (resets optional fields, keeps auth) ────────────────────
+#clearing profile data
 @app.post("/profile/clear")
 def clear_profile_data(current_user: dict = Depends(get_current_user)):
     conn = get_db()
@@ -308,7 +308,7 @@ def clear_profile_data(current_user: dict = Depends(get_current_user)):
     return {"message": "Profile data cleared"}
 
 
-# ── Delete Account ─────────────────────────────────────────────────────────────
+#Deleting account
 @app.delete("/account")
 def delete_account(current_user: dict = Depends(get_current_user)):
     username = current_user["username"]
@@ -456,7 +456,7 @@ async def batch_combined_pdf(
     return FileResponse(combined_path, media_type="application/pdf",
                         filename=f"OnchoScan_Batch_Report_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf")
 
-# ── Delete selected predictions ────────────────────────────────────────────────
+#deleting selected predictions
 @app.delete("/history")
 def delete_history(ids: list[str], current_user: dict = Depends(get_current_user)):
     conn = get_db()
@@ -482,7 +482,7 @@ def history(current_user: dict = Depends(get_current_user)):
     return {"history": [dict(r) for r in rows]}
 
 
-# ── Analytics endpoint ─────────────────────────────────────────────────────────
+#endpoint of Analytics
 @app.get("/analytics")
 def analytics(current_user: dict = Depends(get_current_user)):
     conn = get_db()
@@ -499,30 +499,29 @@ def analytics(current_user: dict = Depends(get_current_user)):
     if total == 0:
         return {"total": 0, "empty": True}
 
-    # ── Counts by cancer type
+ 
     brain = sum(1 for s in scans if s.get("cancer_type") == "brain")
     skin  = sum(1 for s in scans if s.get("cancer_type") == "skin")
 
-    # ── Counts by risk level
+
     high   = sum(1 for s in scans if s.get("risk_level") == "High Risk")
     medium = sum(1 for s in scans if s.get("risk_level") == "Medium Risk")
     low    = sum(1 for s in scans if s.get("risk_level") == "Low Risk")
 
-    # ── Counts by analysis type
+    
     single_count = sum(1 for s in scans if s.get("analysis_type") == "single")
     batch_count  = sum(1 for s in scans if s.get("analysis_type") == "batch")
 
-    # ── Average confidence
     confs = [s["confidence"] for s in scans if s.get("confidence") is not None]
     avg_conf = round(sum(confs) / len(confs), 1) if confs else 0
 
-    # ── Prediction breakdown (all classes)
+    # Prediction breakdown
     pred_counts = {}
     for s in scans:
         p = (s.get("prediction") or "unknown").strip().lower()
         pred_counts[p] = pred_counts.get(p, 0) + 1
 
-    # ── Scans per day (last 30 days)
+    # Scans per day (last 30 days)
     from collections import defaultdict
     import datetime as dt
     daily = defaultdict(int)
@@ -539,7 +538,7 @@ def analytics(current_user: dict = Depends(get_current_user)):
         d = (today - dt.timedelta(days=i)).isoformat()
         daily_series.append({"date": d, "count": daily.get(d, 0)})
 
-    # ── Scans per month (last 12 months)
+    #Scans per month (last 12 months)
     monthly = defaultdict(int)
     for s in scans:
         try:
@@ -553,7 +552,7 @@ def analytics(current_user: dict = Depends(get_current_user)):
         key = m.strftime("%Y-%m")
         monthly_series.append({"month": key, "label": m.strftime("%b %Y"), "count": monthly.get(key, 0)})
 
-    # ── Confidence distribution buckets
+    #Confidence distribution buckets
     conf_buckets = {"<50%": 0, "50-65%": 0, "65-80%": 0, "80-90%": 0, ">90%": 0}
     for s in scans:
         c2 = s.get("confidence") or 0
@@ -563,7 +562,7 @@ def analytics(current_user: dict = Depends(get_current_user)):
         elif c2 < 90: conf_buckets["80-90%"] += 1
         else:         conf_buckets[">90%"] += 1
 
-    # ── Patient stats
+    # Patient stats
     patient_names = [s.get("patient_name","").strip() for s in scans if (s.get("patient_name") or "").strip()]
     unique_patients = len(set(patient_names))
     patient_counts = {}
@@ -571,10 +570,9 @@ def analytics(current_user: dict = Depends(get_current_user)):
         patient_counts[p] = patient_counts.get(p, 0) + 1
     top_patients = sorted(patient_counts.items(), key=lambda x: -x[1])[:5]
 
-    # ── Risk over time (last 20 scans)
+    # Risk over time (last 20 scans)
     risk_timeline = [{"timestamp": s["timestamp"][:10], "risk_level": s.get("risk_level",""), "confidence": s.get("confidence",0), "prediction": s.get("prediction","")} for s in scans[-20:]]
 
-    # ── Most recent scan
     latest = scans[-1] if scans else None
 
     return {
@@ -595,7 +593,7 @@ def analytics(current_user: dict = Depends(get_current_user)):
     }
 
 
-# ── Get all unique patient names for dropdown ───────────────────────────────────
+# Get all unique patient names
 @app.get("/history/patients")
 def get_patients(current_user: dict = Depends(get_current_user)):
     conn = get_db()
@@ -609,7 +607,7 @@ def get_patients(current_user: dict = Depends(get_current_user)):
     return {"patients": [r["patient_name"] for r in rows]}
 
 
-# ── Get all scans for a specific patient ────────────────────────────────────────
+# Get all scans for a specific patient
 @app.get("/history/patient/{patient_name}")
 def get_patient_scans(patient_name: str, current_user: dict = Depends(get_current_user)):
     conn = get_db()
