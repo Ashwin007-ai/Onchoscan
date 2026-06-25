@@ -13,16 +13,16 @@ import uuid
 from pytorch_grad_cam.utils.image import show_cam_on_image
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 
-from recommendation_engine import generate_recommendation   # ← NEW
+from recommendation_engine import generate_recommendation   
 
-# ─── TRANSFORM ─────────────────────────────────────────────────────────────────
+# Transform
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-# ─── PREDICTORS ────────────────────────────────────────────────────────────────
+# prediction of bbrain and skin
 def predict_brain(image):
     t     = transform(image).unsqueeze(0).to(device)
     out   = brain_model(t)
@@ -37,7 +37,7 @@ def predict_skin(image):
     idx   = torch.argmax(out, 1).item()
     return skin_classes[idx], probs[0][idx].item(), probs[0].tolist()
 
-# ─── RISK HELPERS ──────────────────────────────────────────────────────────────
+# risk score and level
 SAFE_PREDICTIONS = {"notumor", "benign"}
 
 def get_risk_score(prediction, confidence):
@@ -66,7 +66,7 @@ def generate_diagnostic_text(prediction, confidence):
         f"Immediate clinical verification is strongly recommended."
     )
 
-# ─── HEATMAP ───────────────────────────────────────────────────────────────────
+# heatmap
 def generate_heatmap(image, model_type, predicted_class):
     image_resized = image.resize((224, 224))
     image_np      = np.array(image_resized) / 255.0
@@ -170,7 +170,7 @@ def _describe_attention_profile(image, model_type, predicted_class):
         "attention_zone": f"{vertical} {horizontal}".strip(),
     }
 
-# ─── MAIN ROUTER ───────────────────────────────────────────────────────────────
+#Main router
 def predict_cancer(image, cancer_type):
     if cancer_type == "brain":
         pred, conf, all_probs = predict_brain(image)
@@ -187,7 +187,7 @@ def predict_cancer(image, cancer_type):
     risk_level = get_risk_level(risk_score)
     diagnostic = generate_diagnostic_text(pred, conf)
 
-    # ── Class probabilities dict (percentage values) ───────────────────────
+    
     class_probabilities = {
         cls: round(p * 100, 2)
         for cls, p in zip(all_classes, all_probs)
@@ -195,21 +195,18 @@ def predict_cancer(image, cancer_type):
     image_profile = _describe_image_profile(image)
     attention_profile = _describe_attention_profile(image, cancer_type, predicted_class)
 
-    # ── Generate Grad-CAM heatmap ──────────────────────────────────────────
+  
     heatmap_path, original_path = generate_heatmap(image, cancer_type, predicted_class)
 
-    # ── Dynamic AI recommendation via Groq + LLaMA 3 ──────────────────────
-    # LLaMA reads the full probability distribution and generates a unique
-    # clinical paragraph for every scan based on actual image patterns.
-    # Falls back safely to a static message if Groq is unavailable.
+    # AI recommendation using Groq
     recommendation = generate_recommendation(
         cancer_type    = cancer_type,
         prediction     = pred,
-        confidence     = round(conf * 100, 2),  # percentage e.g. 87.3
+        confidence     = round(conf * 100, 2),  
         risk_level     = risk_level,
         risk_score     = risk_score,
-        probabilities  = class_probabilities,   # full dict e.g. {"glioma": 87.3, ...}
-        gradcam_region = "",                    # extend later if region detection added
+        probabilities  = class_probabilities,   
+        gradcam_region = "",                    
         image_profile  = image_profile,
         attention_profile = attention_profile,
     )
@@ -221,7 +218,7 @@ def predict_cancer(image, cancer_type):
         "risk_score":          risk_score,
         "risk_level":          risk_level,
         "diagnostic_text":     diagnostic,
-        "recommendation":      recommendation,   # ← single AI paragraph (replaces suggestions list)
+        "recommendation":      recommendation,   
         "class_probabilities": class_probabilities,
         "heatmap":             heatmap_path,
         "original":            original_path,
