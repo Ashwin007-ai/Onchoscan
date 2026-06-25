@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-/* ── Section titles ──────────────────────────────────────────── */
+/* Section titles*/
 .ab-section { max-width: 900px; margin: 0 auto 40px; }
 .ab-section-title {
   display: flex; align-items: center; gap: 12px;
@@ -26,7 +26,7 @@
   content: ''; flex: 1; height: 1px; background: var(--border2);
 }
 
-/* ── Hero banner ─────────────────────────────────────────────── */
+/*Hero banner */
 .ab-hero {
   max-width: 900px; margin: 0 auto 48px;
   background: linear-gradient(135deg, rgba(79,255,176,.06) 0%, rgba(0,212,255,.04) 100%);
@@ -53,11 +53,10 @@
 .ab-stat-num { font-size: 1.5rem; font-weight: 700; color: var(--accent); line-height: 1; }
 .ab-stat-label { font-size: 0.75rem; color: var(--text3); }
 
-/* ── Two-column grid ─────────────────────────────────────────── */
 .ab-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .ab-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 
-/* ── Generic info card ───────────────────────────────────────── */
+
 .ab-card {
   background: var(--surface); border: 1.5px solid var(--border);
   border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 14px;
@@ -75,7 +74,7 @@
 }
 .ab-card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; }
 
-/* ── Feature row (icon + text) ───────────────────────────────── */
+
 .ab-feat-list { display: flex; flex-direction: column; gap: 12px; }
 .ab-feat {
   display: flex; gap: 12px; align-items: flex-start;
@@ -86,7 +85,7 @@
 .ab-feat-text strong { display: block; font-size: 0.85rem; color: var(--text); margin-bottom: 2px; }
 .ab-feat-text span  { font-size: 0.8rem; color: var(--text2); line-height: 1.55; }
 
-/* ── Model chips ─────────────────────────────────────────────── */
+/*Model chips */
 .ab-model-chip {
   padding: 14px 16px; background: var(--bg3);
   border-radius: 12px; border: 1px solid var(--border2);
@@ -98,7 +97,7 @@
 .ab-model-chip .mc-desc { font-size: 0.8rem; color: var(--text3); line-height: 1.55; margin-top: 4px; }
 .ab-model-chips { display: flex; flex-direction: column; gap: 10px; }
 
-/* ── Accuracy bar ────────────────────────────────────────────── */
+/*Accuracy bar*/
 .acc-row { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
 .acc-label-row { display: flex; justify-content: space-between; font-size: 0.78rem; }
 .acc-label-row span:first-child { color: var(--text2); }
@@ -124,7 +123,7 @@
   color: var(--accent2); font-size: 1rem; flex-shrink: 0;
 }
 
-/* ── Tech stack ──────────────────────────────────────────────── */
+/* Tech stack*/
 .ab-tech-grid { display: flex; flex-wrap: wrap; gap: 10px; }
 .ab-tech {
   display: flex; flex-direction: column; gap: 3px;
@@ -134,7 +133,7 @@
 .ab-tech .t-name { font-size: 0.82rem; font-weight: 700; color: var(--accent2); }
 .ab-tech .t-role { font-size: 0.72rem; color: var(--text3); }
 
-/* ── How it works steps ──────────────────────────────────────── */
+/* How it works steps */
 .ab-steps { display: flex; flex-direction: column; gap: 0; }
 .ab-step {
   display: flex; gap: 16px; align-items: flex-start;
@@ -151,7 +150,7 @@
 .ab-step-body strong { display: block; font-size: 0.88rem; color: var(--text); margin-bottom: 3px; }
 .ab-step-body span { font-size: 0.82rem; color: var(--text2); line-height: 1.6; }
 
-/* ── Grad-CAM explanation ────────────────────────────────────── */
+/* GradCAM explanation*/
 .gradcam-visual {
   display: flex; gap: 8px; margin: 8px 0; align-items: center; flex-wrap: wrap;
 }
@@ -166,7 +165,7 @@
 .gcv-arrow { color: var(--text3); font-size: 1rem; flex-shrink: 0; }
 .gcv-label { font-size: 0.68rem; color: var(--text3); margin-top: 4px; }
 
-/* ── Dataset cards ───────────────────────────────────────────── */
+/*Dataset cards*/
 .ab-dataset {
   padding: 14px 16px; background: var(--bg3); border-radius: 12px;
   border: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start;
@@ -180,7 +179,7 @@
 .ab-dataset .ds-stats { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
 .ab-dataset .ds-stat  { font-size: 0.72rem; color: var(--accent2); background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.2); border-radius: 6px; padding: 2px 8px; font-weight: 600; }
 
-/* ── Risk level table ────────────────────────────────────────── */
+/* Risk level table  */
 .risk-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 8px; }
 .risk-table th { text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); padding: 6px 10px; border-bottom: 1px solid var(--border2); }
 .risk-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; line-height: 1.55; }
@@ -190,7 +189,7 @@
 .rtag.medium { background: rgba(255,184,79,.1);  color: var(--medium); border: 1px solid rgba(255,184,79,.3); }
 .rtag.low    { background: rgba(79,255,176,.1);  color: var(--low);    border: 1px solid rgba(79,255,176,.3); }
 
-/* ── Disclaimer ──────────────────────────────────────────────── */
+/* Disclaimer*/
 .ab-disclaimer {
   max-width: 900px; margin: 0 auto 40px;
   background: rgba(255,79,123,.04); border: 1px solid rgba(255,79,123,.25);
@@ -201,7 +200,7 @@
 .ab-disclaimer p  { font-size: 0.85rem; color: var(--text2); line-height: 1.7; margin: 0; }
 .ab-disclaimer strong { color: var(--high); }
 
-/* ── FAQ accordion ───────────────────────────────────────────── */
+/* FAQ*/
 .ab-faq { display: flex; flex-direction: column; gap: 8px; }
 .faq-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 .faq-q {
@@ -216,7 +215,7 @@
 .faq-a { display: none; padding: 0 16px 14px; font-size: 0.83rem; color: var(--text2); line-height: 1.7; }
 .faq-item.open .faq-a { display: block; }
 
-/* ── Responsive ──────────────────────────────────────────────── */
+
 @media (max-width: 700px) {
   .ab-grid-2, .ab-grid-3 { grid-template-columns: 1fr; }
   .ab-card.full { grid-column: 1; }
@@ -262,7 +261,7 @@
     <p>Everything you need to know about OnchoScan — how it works, what powers it, and how to use it effectively.</p>
   </section>
 
-  <!-- ── HERO BANNER ──────────────────────────────────────────── -->
+  <!-- HERO BANNER-->
   <div class="ab-hero">
     <div class="ab-hero-label"><span></span> AI-Powered Medical Screening Platform</div>
     <h2>What is <em>OnchoScan?</em></h2>
@@ -276,7 +275,7 @@
     </div>
   </div>
 
-  <!-- ── KEY FEATURES ─────────────────────────────────────────── -->
+  <!-- KEY FEATURES -->
   <div class="ab-section">
     <div class="ab-section-title">✦ Key Features</div>
     <div class="ab-grid-2">
@@ -324,7 +323,7 @@
     </div>
   </div>
 
-  <!-- ── AI MODELS ────────────────────────────────────────────── -->
+  <!--AI MODELS -->
   <div class="ab-section">
     <div class="ab-section-title">🤖 AI Models</div>
     <div class="ab-grid-2">
@@ -372,7 +371,7 @@
     </div>
   </div>
 
-  <!-- ── DATASETS ─────────────────────────────────────────────── -->
+  <!-- DATASETS -->
   <div class="ab-section">
     <div class="ab-section-title">📊 Training Datasets</div>
     <div class="ab-card full" style="max-width:900px;margin:0 auto">
@@ -407,7 +406,7 @@
     </div>
   </div>
 
-  <!-- ── GRAD-CAM ─────────────────────────────────────────────── -->
+  <!-- GRAD-CAM -->
   <div class="ab-section">
     <div class="ab-section-title">🔬 Explainability — Grad-CAM</div>
     <div class="ab-grid-2">
@@ -437,7 +436,7 @@
     </div>
   </div>
 
-  <!-- ── RISK LEVELS ──────────────────────────────────────────── -->
+  <!-- RISK LEVELS  -->
   <div class="ab-section">
     <div class="ab-section-title">⚠️ Risk Level System</div>
     <div class="ab-card full" style="max-width:900px;margin:0 auto">
@@ -470,7 +469,7 @@
     </div>
   </div>
 
-  <!-- ── SYSTEM PIPELINE ──────────────────────────────────────── -->
+  <!-- SYSTEM PIPELINE -->
   <div class="ab-section">
     <div class="ab-section-title">⚙️ System Pipeline</div>
     <div class="ab-card full" style="max-width:900px;margin:0 auto">
@@ -501,7 +500,7 @@
     </div>
   </div>
 
-  <!-- ── TECH STACK ───────────────────────────────────────────── -->
+  <!--TECH STACK -->
   <div class="ab-section">
     <div class="ab-section-title">🛠️ Technology Stack</div>
     <div class="ab-card full" style="max-width:900px;margin:0 auto">
@@ -537,7 +536,7 @@
     </div>
   </div>
 
-  <!-- ── HOW TO USE ───────────────────────────────────────────── -->
+  <!-- HOW TO USE -->
   <div class="ab-section">
     <div class="ab-section-title">📖 How to Use OnchoScan</div>
     <div class="ab-grid-2">
@@ -566,7 +565,7 @@
     </div>
   </div>
 
-  <!-- ── FAQ ─────────────────────────────────────────────────── -->
+  <!-- FAQ -->
   <div class="ab-section">
     <div class="ab-section-title">❓ Frequently Asked Questions</div>
     <div class="ab-card full" style="max-width:900px;margin:0 auto">
@@ -603,7 +602,7 @@
     </div>
   </div>
 
-  <!-- ── DISCLAIMER ───────────────────────────────────────────── -->
+  <!-- DISCLAIMER -->
   <div class="ab-disclaimer">
     <div class="ab-disclaimer-icon">⚠️</div>
     <div>
@@ -637,7 +636,7 @@
   bars.forEach(function(b) { obs.observe(b); });
 })();
 
-// FAQ accordion
+// FAQ 
 document.querySelectorAll('.faq-q').forEach(function(btn) {
   btn.addEventListener('click', function() {
     var item = btn.closest('.faq-item');
