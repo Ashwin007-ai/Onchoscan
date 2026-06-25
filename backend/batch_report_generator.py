@@ -1,6 +1,3 @@
-"""
-batch_report_generator.py - Updated to use dynamic AI recommendation paragraph.
-"""
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.units import inch
@@ -178,7 +175,7 @@ def generate_batch_pdf_report(results, cancer_type):
         clean = (r.get("diagnostic_text","").replace("<strong>","").replace("</strong>",""))
         story.append(Paragraph(clean, body_s))
 
-        # ── AI Recommendation (dynamic, unique per scan) ───────────────────
+        # AI Recommendation
         recommendation = r.get("recommendation","")
         if recommendation:
             story.append(Paragraph("AI-Generated Clinical Recommendation", head_s))
