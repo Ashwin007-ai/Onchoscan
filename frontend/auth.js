@@ -1,6 +1,5 @@
 const API = "http://127.0.0.1:8000";
 
-// Bounce to dashboard only if token exists and we are on login page
 (function() {
   const t = localStorage.getItem("oncho_token");
   const path = window.location.pathname;
@@ -10,7 +9,7 @@ const API = "http://127.0.0.1:8000";
   }
 })();
 
-// ── Tab switching ─────────────────────────────────────────────────────────────
+// Tab switching
 function switchTab(tab) {
   document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
   document.querySelectorAll(".auth-form").forEach(f => f.classList.remove("active"));
@@ -35,7 +34,7 @@ function togglePass(inputId, btn) {
   btn.textContent = inp.type === "password" ? "👁" : "🙈";
 }
 
-// ── LOGIN ─────────────────────────────────────────────────────────────────────
+//  LOGIN 
 async function doLogin(e) {
   if (e) e.preventDefault();
   clearErrors();
@@ -72,12 +71,11 @@ async function doLogin(e) {
       return;
     }
 
-    // Store token first, THEN navigate
     localStorage.setItem("oncho_token", data.access_token);
     localStorage.setItem("oncho_user",  data.username);
     localStorage.setItem("oncho_name",  data.full_name || data.username);
 
-    // Use assign instead of replace so it fully navigates
+
     window.location.assign("dashboard.html");
 
   } catch(err) {
@@ -87,7 +85,7 @@ async function doLogin(e) {
   }
 }
 
-// ── REGISTER ──────────────────────────────────────────────────────────────────
+// REGISTER 
 async function doRegister(e) {
   if (e) e.preventDefault();
   clearErrors();
@@ -139,17 +137,15 @@ async function doRegister(e) {
     btn.disabled = false;
   }
 }
-
-// ── Wire up buttons properly after DOM loads ──────────────────────────────────
 document.addEventListener("DOMContentLoaded", function() {
-  // Attach click handlers via JS (not just onclick attribute) to prevent any default behavior
+  
   const loginBtn    = document.querySelector("#loginForm .btn-primary");
   const registerBtn = document.querySelector("#registerForm .btn-primary");
 
   if (loginBtn)    loginBtn.addEventListener("click",    doLogin);
   if (registerBtn) registerBtn.addEventListener("click", doRegister);
 
-  // Enter key — preventDefault to stop any page reload
+  
   document.addEventListener("keydown", function(e) {
     if (e.key !== "Enter") return;
     e.preventDefault();
@@ -158,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function() {
     else doRegister();
   });
 
-  // Also prevent any accidental form submit on inputs
+
   document.querySelectorAll(".inp").forEach(inp => {
     inp.addEventListener("keydown", function(e) {
       if (e.key === "Enter") {
