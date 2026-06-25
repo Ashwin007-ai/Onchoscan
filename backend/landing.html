@@ -33,7 +33,7 @@
     overflow-x: hidden;
   }
 
-  /* ── NAVBAR ───────────────────────────────────────────── */
+  /*navbar*/
   .navbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
@@ -89,7 +89,7 @@
   }
   .btn-nav-reg:hover { opacity: 0.88; transform: translateY(-1px); }
 
-  /* ── HERO ──────────────────────────────────────────────── */
+  /*hero*/
   .hero {
     position: relative;
     min-height: 100vh;
@@ -114,7 +114,7 @@
       linear-gradient(90deg, rgba(79,255,176,0.03) 1px, transparent 1px);
     background-size: 50px 50px;
   }
-  /* Big faint circle scanner motif */
+
   .hero-scanner {
     position: absolute; right: 3%; top: 50%;
     transform: translateY(-50%);
@@ -270,7 +270,7 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ── STEPS SECTION ──────────────────────────────────────── */
+  /* STEPS SECTION*/
   .steps-section {
     background: linear-gradient(180deg, #030f1e 0%, #020a14 100%);
     padding: 90px 5%;
@@ -351,7 +351,7 @@
   }
   .step-card p { font-size: 0.83rem; color: var(--text2); line-height: 1.65; }
 
-  /* connector arrow between steps */
+
   .step-connector {
     display: flex; align-items: center; justify-content: center;
     color: var(--text3); font-size: 1.1rem; padding-top: 32px;
@@ -359,7 +359,7 @@
   }
   @media(max-width:768px) { .step-connector { display: none; } }
 
-  /* ── WHY SECTION ──────────────────────────────────────── */
+  /*WHY SECTION */
   .why-section {
     background: #020a14;
     padding: 90px 5%;
@@ -420,7 +420,7 @@
   }
   .btn-cta:hover { opacity: 0.88; transform: translateY(-1px); }
 
-  /* ── TESTIMONIALS ──────────────────────────────────────── */
+  /* Testimonials*/
   .testimonials-section {
     background: linear-gradient(180deg, #020a14 0%, #030f1e 100%);
     padding: 90px 5%;
@@ -434,7 +434,7 @@
   }
   .testi-header { text-align: center; margin-bottom: 52px; }
   .testi-track-wrap { overflow: hidden; position: relative; }
-  /* Fade edges */
+
   .testi-track-wrap::before, .testi-track-wrap::after {
     content: ''; position: absolute; top: 0; bottom: 0; width: 80px; z-index: 2; pointer-events: none;
   }
@@ -475,7 +475,7 @@
   .testi-name { font-family: var(--font); font-size: 0.85rem; font-weight: 700; color: #fff; }
   .testi-role { font-size: 0.72rem; color: var(--text3); }
 
-  /* ── FAQ ──────────────────────────────────────────────── */
+  /* FAQ*/
   .faq-section {
     background: #030f1e;
     padding: 90px 5%;
@@ -513,7 +513,7 @@
   }
   .faq-item.open .faq-a { max-height: 200px; padding: 0 20px 18px; }
 
-  /* ── FOOTER ──────────────────────────────────────────── */
+  /* Footer*/
   .footer {
     background: var(--navy2);
     border-top: 1px solid var(--border);
@@ -535,7 +535,7 @@
   .footer-links a:hover { color: var(--text2); }
   .footer-copy { font-size: 0.78rem; color: var(--text3); }
 
-  /* ── Responsive ──────────────────────────────────────── */
+
   @media(max-width:900px) {
     .hero-img-wrap, .hero-scanner, .hero-scanline { display: none; }
     .hero-content { max-width: 100%; }
@@ -549,7 +549,7 @@
 </head>
 <body>
 
-<!-- ── NAVBAR ─────────────────────────────────────────────── -->
+<!--NAVBAR-->
 <nav class="navbar" id="navbar">
   <a href="#" class="nav-brand">
     <div class="nav-logo">
@@ -573,12 +573,12 @@
   </div>
 </nav>
 
-<!-- ── HERO ───────────────────────────────────────────────── -->
+<!-- HERO-->
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
 
-  <!-- Scanner visual -->
+
   <div class="hero-scanner"></div>
   <div class="hero-scanline"></div>
   <div class="hero-img-wrap">
@@ -639,7 +639,7 @@
   </div>
 </section>
 
-<!-- ── STEPS SECTION ──────────────────────────────────────── -->
+<!--STEPS SECTION-->
 <section class="steps-section" id="steps">
   <div class="section-label">How It Works</div>
   <h2 class="section-title">From scan to report<br>in 4 simple steps</h2>
@@ -673,7 +673,7 @@
   </div>
 </section>
 
-<!-- ── WHY SECTION ────────────────────────────────────────── -->
+<!--WHY SECTION -->
 <section class="why-section" id="why">
   <div>
     <div class="section-label">Why OnchoScan</div>
@@ -726,7 +726,7 @@
   </div>
 </section>
 
-<!-- ── TESTIMONIALS ───────────────────────────────────────── -->
+<!--TESTIMONIALS-->
 <section class="testimonials-section" id="testimonials">
   <div class="testi-header">
     <div class="section-label" style="justify-content:center;gap:8px">
@@ -841,7 +841,7 @@
   </div>
 </section>
 
-<!-- ── FAQ ────────────────────────────────────────────────── -->
+<!--FAQ -->
 <section style="background:#030f1e;padding:90px 5%">
   <div style="max-width:720px;margin:0 auto" id="faq">
     <div class="section-label">FAQ</div>
@@ -895,7 +895,7 @@
   </div>
 </section>
 
-<!-- ── FOOTER ─────────────────────────────────────────────── -->
+<!--FOOTER -->
 <footer class="footer">
   <div class="footer-brand">
     <div class="nav-logo">
@@ -916,7 +916,7 @@
 </footer>
 
 <script>
-  // FAQ toggle
+
   function toggleFaq(btn) {
     var item = btn.parentElement;
     var wasOpen = item.classList.contains('open');
@@ -924,7 +924,7 @@
     if (!wasOpen) item.classList.add('open');
   }
 
-  // Navbar scroll opacity
+
   window.addEventListener('scroll', function() {
     var nb = document.getElementById('navbar');
     if (window.scrollY > 40) {
@@ -934,8 +934,7 @@
     }
   });
 
-  // Smooth scroll for anchor links
-  // Smart CTA: if not logged in, send to login page; if logged in, go to dashboard
+
   var ctaBtns = [document.getElementById("ctaMain"), document.getElementById("ctaSecond")];
   var isLoggedIn = !!localStorage.getItem("oncho_token");
   ctaBtns.forEach(function(btn) {
@@ -943,7 +942,7 @@
     if (!isLoggedIn) {
       btn.href = "/app/index.html";
     }
-    // if logged in, href="/app/dashboard.html" stays as set in HTML
+   
   });
 
   document.querySelectorAll('a[href^="#"]').forEach(function(a) {
