@@ -16,7 +16,7 @@ var selectedType = "brain";
 
 window.addEventListener("load", async function() {
 
-  // ── Nav: load user info from server ────────────────────────────────────────
+  //Nav: load user info from server 
   var av = document.getElementById("navAvatar");
   var nm = document.getElementById("navUsername");
 
@@ -40,9 +40,9 @@ window.addEventListener("load", async function() {
         av.textContent = name[0].toUpperCase();
       }
     }
-  } catch(e) { /* server not reachable, keep cached */ }
+  } catch(e) {  }
 
-  // ── Clicking avatar or name opens profile ────────────────────────────────
+  //  Clicking avatar or name opens profile 
   function makeProfileLink(el) {
     if (!el) return;
     el.style.cursor = "pointer";
@@ -52,11 +52,11 @@ window.addEventListener("load", async function() {
   makeProfileLink(av);
   makeProfileLink(nm);
 
-  // ── Logout btn ───────────────────────────────────────────────────────────
+  // Logout btn 
   var logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) logoutBtn.addEventListener("click", window.logout);
 
-  // ── Dashboard only ────────────────────────────────────────────────────────
+  
   var fileInput  = document.getElementById("fileInput");
   var predictBtn = document.getElementById("predictBtn");
   if (!fileInput || !predictBtn) return;
@@ -131,7 +131,7 @@ window.addEventListener("load", async function() {
       displayResults(r);
       if (window.PatientNotes) window.PatientNotes.showInResults(r);
 
-      // ── Notifications ──────────────────────────────────────────────────────
+      //Notifications 
       var isHigh = r.risk_level === "High Risk";
       var isMed  = r.risk_level === "Medium Risk";
       var icon   = isHigh ? "🚨" : isMed ? "⚠️" : "✅";
@@ -141,13 +141,11 @@ window.addEventListener("load", async function() {
                    " · " + r.prediction + " · " + r.risk_level +
                    " (" + r.confidence + "%)";
 
-      // Toast pop-up
+      
       if (window.Toast) window.Toast[type](title, msg);
 
-      // Bell panel entry
       if (window.NotifPanel) window.NotifPanel.add(title, msg, icon);
 
-      // Extra prominent alert for High Risk
       if (isHigh && window.Toast) {
         setTimeout(function() {
           window.Toast.error("⚠️ High Risk Detected", "Please review the diagnostic report immediately.", 7000);
@@ -168,7 +166,6 @@ window.addEventListener("load", async function() {
 });
 
 function displayResults(r) {
-  // Hide empty state, show results
   var es = document.getElementById("emptyState");
   if (es) es.style.display = "none";
   document.getElementById("resultsPanel").classList.remove("hidden");
@@ -205,7 +202,7 @@ function displayResults(r) {
     }).join("");
   }
 
-  // ── AI Clinical Recommendation ─────────────────────────────────────────────
+  //AI Clinical Recommendation
   var recPanel = document.getElementById("recommendationPanel");
   var recText  = document.getElementById("recommendationText");
   if (recPanel && recText) {
