@@ -81,7 +81,7 @@ def build_model(device):
     return model.to(device)
 
 
-def train_model(model, train_loader, device, epochs=10):
+def train_model(model, train_loader, device, epochs=20):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
